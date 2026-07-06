@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GuruKu - Portal Akademik Guru Modern</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (Excel Import & Export) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Html2Pdf.js bundle -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Vue.js 3 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #8E44AD;
+            --primary-light: #9B59B6;
+            --accent-color: #E67E22;
+            --bg-light: #F4F3F8;
+            --bg-card: #FFFFFF;
+            --text-dark: #2C3E50;
+            --text-muted: #7F8C8D;
+            --sidebar-width: 260px;
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            --bg-light: #1E1B29;
+            --bg-card: #2B263F;
+            --text-dark: #E1DBEC;
+            --text-muted: #A29BFE;
+        }
+
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+            margin: 0;
+            padding: 0;
+        }
+
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
+
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.15;
+            background-image: radial-gradient(var(--primary-light) 1px, transparent 1px), radial-gradient(var(--accent-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            animation: moveBg 20s linear infinite;
+            pointer-events: none; 
+        }
+
+        @keyframes moveBg {
+            0% { background-position: 0 0, 20px 20px; }
+            100% { background-position: 40px 40px, 60px 60px; }
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(43, 38, 63, 0.85);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform var(--transition-speed) ease-in-out;
+            z-index: 1030;
+            color: #FFFFFF;
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left var(--transition-speed);
+            padding: 24px;
+        }
+
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .nav-link-custom {
+            color: rgba(255, 255, 255, 0.7);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            margin: 4px 15px;
+            transition: all var(--transition-speed);
+            font-size: 0.95rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .nav-link-custom i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-link-custom:hover, .nav-link-custom.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: #FFFFFF;
+            box-shadow: 0 4px 15px rgba(142, 68, 173, 0.4);
+        }
+
+        .card-custom {
+            background-color: var(--bg-card);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            overflow: hidden;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(142, 68, 173, 0.15);
+        }
+
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(142, 68, 173, 0.1) 0%, rgba(230, 126, 34, 0.1) 100%);
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+            padding: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        [data-theme="dark"] .form-control, [data-theme="dark"] .form-select {
+            background-color: #241F35;
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #E1DBEC;
+        }
+
+        [data-theme="dark"] .form-control:focus, [data-theme="dark"] .form-select:focus {
+            background-color: #2B263F;
+            border-color: var(--primary-light);
+            color: #E1DBEC;
+        }
+
+        .table-report {
+            border: 2px solid #2C3E50 !important;
+        }
+        .table-report th {
+            background-color: #ECEFF1 !important;
+            color: #2C3E50 !important;
+            font-weight: 700;
+            border: 1px solid #7F8C8D !important;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .table-report td {
+            border: 1px solid #BDC3C7 !important;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+        
+        .cell-present { background-color: #E8F8F5 !important; color: #117A65 !important; font-weight: bold; }
+        .cell-absent { background-color: #FDEDEC !important; color: #C0392B !important; font-weight: bold; }
+        .cell-permission { background-color: #FEF9E7 !important; color: #D4AC0D !important; font-weight: bold; }
+        .score-low { background-color: #FDEDEC !important; color: #C0392B !important; }
+        .score-high { background-color: #E8F8F5 !important; color: #117A65 !important; }
+
+        .table-report tr { page-break-inside: avoid; } /* Mencegah baris tabel terpotong di PDF */
+
+        @media print {
+            @page { size: auto; margin: 10mm; } /* Margin 1cm untuk kertas fisik */
+            .sidebar, .navbar, .btn, .no-print, .btn-group, .alert { display: none !important; }
+            .main-content { margin-left: 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; }
+            .card-custom { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+            body { background-color: #FFFFFF !important; color: #000000 !important; font-size: 11pt !important; }
+            table { width: 100% !important; page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+            thead { display: table-header-group; }
+            tfoot { display: table-footer-group; }
+            .signature-section { page-break-inside: avoid; } /* Mencegah TTD terpotong beda halaman */
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+
+<div id="app">
+    <!-- LOADING SPINNER -->
+    <div v-if="loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style="z-index: 9999;">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Memuat...</span>
+        </div>
+    </div>
+
+    <!-- HALAMAN AUTENTIKASI -->
+    <div v-if="!isLoggedIn" class="auth-container">
+        <div class="auth-card">
+            <div class="text-center mb-4">
+                <div class="mb-2"><i class="fa-solid fa-graduation-cap fa-3x text-primary"></i></div>
+                <h3 class="fw-bold text-primary">GuruKu</h3>
+                <p class="text-muted small">Manajemen Kelas & Penilaian Modern</p>
+            </div>
+
+            <form v-if="authView === 'login'" @submit.prevent="handleLogin">
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" v-model="authForm.email" required placeholder="guru@guruku.id">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Kata Sandi</label>
+                    <input type="password" class="form-control" v-model="authForm.password" required placeholder="••••••••">
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="rememberMe" v-model="authForm.remember">
+                        <label class="form-check-label small" for="rememberMe">Ingat Saya</label>
+                    </div>
+                    <span class="small text-primary cursor-pointer text-decoration-underline" @click="authView = 'reset'">Lupa Sandi?</span>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2" style="background-color: var(--primary-color);">Masuk <i class="fa-solid fa-sign-in ms-2"></i></button>
+            </form>
+
+            <form v-if="authView === 'reset'" @submit.prevent="handleResetPassword">
+                <p class="text-muted small text-center mb-4">Masukkan email Anda untuk melakukan reset kata sandi default.</p>
+                <div class="mb-3">
+                    <label class="form-label">Email Terdaftar</label>
+                    <input type="email" class="form-control" v-model="authForm.email" required placeholder="guru@guruku.id">
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 mb-2" style="background-color: var(--primary-color);">Kirim Link Reset</button>
+                <button type="button" class="btn btn-light w-100 py-2" @click="authView = 'login'">Kembali</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- HALAMAN UTAMA APLIKASI -->
+    <div v-else class="wrapper">
+        <aside class="sidebar" :class="{ 'active': sidebarActive }">
+            <div class="d-flex align-items-center justify-content-between p-4 border-bottom border-secondary">
+                <div class="d-flex align-items-center">
+                    <i class="fa-solid fa-graduation-cap fa-2x me-2 text-warning"></i>
+                    <h4 class="m-0 fw-bold">GuruKu</h4>
+                </div>
+                <button class="btn btn-link text-white d-lg-none" @click="sidebarActive = false"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="py-3 overflow-y-auto" style="height: calc(100vh - 85px);">
+                <div class="nav-link-custom" :class="{active: activeMenu === 'dashboard'}" @click="switchMenu('dashboard')">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </div>
+
+                <div class="px-4 py-2 text-uppercase text-secondary fs-7 fw-semibold">Data Master</div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'subjects'}" @click="switchMenu('subjects')">
+                    <i class="fa-solid fa-book"></i> Mata Pelajaran
+                </div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'classes'}" @click="switchMenu('classes')">
+                    <i class="fa-solid fa-school"></i> Kelas
+                </div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'students'}" @click="switchMenu('students')">
+                    <i class="fa-solid fa-users"></i> Siswa
+                </div>
+
+                <div class="px-4 py-2 text-uppercase text-secondary fs-7 fw-semibold">Akademik</div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'grades'}" @click="switchMenu('grades')">
+                    <i class="fa-solid fa-square-poll-vertical"></i> Nilai Siswa
+                </div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'attendance'}" @click="switchMenu('attendance')">
+                    <i class="fa-solid fa-clipboard-user"></i> Absensi Siswa
+                </div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'journal'}" @click="switchMenu('journal')">
+                    <i class="fa-solid fa-book-open"></i> Jurnal Mengajar
+                </div>
+
+                <div class="px-4 py-2 text-uppercase text-secondary fs-7 fw-semibold">Laporan</div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'reports'}" @click="switchMenu('reports')">
+                    <i class="fa-solid fa-file-invoice"></i> Rekap Laporan
+                </div>
+
+                <div class="px-4 py-2 text-uppercase text-secondary fs-7 fw-semibold">Pengaturan</div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'profile'}" @click="switchMenu('profile')">
+                    <i class="fa-solid fa-user-gear"></i> Profil Guru
+                </div>
+                <div class="nav-link-custom text-danger fw-semibold" @click="handleLogout">
+                    <i class="fa-solid fa-right-from-bracket text-danger"></i> Keluar
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <nav class="navbar navbar-expand-lg card-custom py-3 px-4 mb-4 d-flex justify-content-between align-items-center no-print">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-primary d-lg-none me-3" @click="sidebarActive = true">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h5 class="m-0 fw-bold d-none d-sm-inline-block">Halo, Guru {{ profile.nama || 'Pendidik' }} 👋</h5>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-light rounded-circle" @click="toggleTheme" title="Toggle Tema">
+                        <i :class="theme === 'light' ? 'fa-solid fa-moon' : 'fa-solid fa-sun'"></i>
+                    </button>
+
+                    <div class="dropdown">
+                        <div class="d-flex align-items-center dropdown-toggle text-dark cursor-pointer" @click.stop="showProfileDropdown = !showProfileDropdown">
+                            <img :src="profile.foto || 'https://via.placeholder.com/40/8E44AD/ffffff?text=Guru'" alt="Avatar" class="rounded-circle border me-2" width="40" height="40" style="object-fit: cover;">
+                            <div class="d-none d-md-block text-start">
+                                <p class="m-0 fw-bold small text-dark">{{ profile.nama || 'Guru Utama' }}</p>
+                                <span class="text-muted small" style="font-size: 0.75rem;">Guru Pendidik</span>
+                            </div>
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end card-custom shadow" :class="{ show: showProfileDropdown }" style="position: absolute; right: 0; top: 100%; display: block;" v-if="showProfileDropdown">
+                            <li><div class="dropdown-item nav-link-custom py-2" @click="showProfileDropdown = false; switchMenu('profile')"><i class="fa-solid fa-user-circle me-2"></i> Profil</div></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><div class="dropdown-item nav-link-custom py-2 text-danger" @click="showProfileDropdown = false; handleLogout()"><i class="fa-solid fa-power-off me-2"></i> Keluar</div></li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+            <main class="fade-in">
+                <!-- MENU 1: DASHBOARD -->
+                <div v-if="activeMenu === 'dashboard'">
+                    <div class="row g-4 mb-4">
+                        <div class="col-6 col-lg-3">
+                            <div class="card-custom p-3 text-center h-100">
+                                <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-2" style="width: 60px; height: 60px;"><i class="fa-solid fa-book fa-lg"></i></div>
+                                <h3 class="fw-bold">{{ subjects.length }}</h3>
+                                <p class="text-muted small m-0">Mata Pelajaran</p>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card-custom p-3 text-center h-100">
+                                <div class="p-3 bg-success bg-opacity-10 text-success rounded-circle mx-auto mb-2" style="width: 60px; height: 60px;"><i class="fa-solid fa-school fa-lg"></i></div>
+                                <h3 class="fw-bold">{{ classes.length }}</h3>
+                                <p class="text-muted small m-0">Kelas Diajar</p>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card-custom p-3 text-center h-100">
+                                <div class="p-3 bg-info bg-opacity-10 text-info rounded-circle mx-auto mb-2" style="width: 60px; height: 60px;"><i class="fa-solid fa-users fa-lg"></i></div>
+                                <h3 class="fw-bold">{{ students.length }}</h3>
+                                <p class="text-muted small m-0">Total Siswa</p>
+                            </div>
+                        </div>
+                        <div class="col-6 col-lg-3">
+                            <div class="card-custom p-3 text-center h-100">
+                                <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-circle mx-auto mb-2" style="width: 60px; height: 60px;"><i class="fa-solid fa-book-open fa-lg"></i></div>
+                                <h3 class="fw-bold">{{ journals.length }}</h3>
+                                <p class="text-muted small m-0">Jurnal Mengajar</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-12 col-lg-8">
+                            <div class="card-custom p-4 h-100">
+                                <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-line text-primary me-2"></i>Grafik Kehadiran Mingguan</h5>
+                                <div style="position: relative; height: 280px;">
+                                    <canvas id="attendanceChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4">
+                            <div class="card-custom p-4 h-100">
+                                <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-pie text-warning me-2"></i>Kategori Nilai</h5>
+                                <div style="position: relative; height: 280px;">
+                                    <canvas id="gradesCategoryChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU 2: MATA PELAJARAN -->
+                <div v-if="activeMenu === 'subjects'">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold m-0"><i class="fa-solid fa-book text-primary me-2"></i>Daftar Mata Pelajaran</h4>
+                        <button class="btn btn-primary" @click="openModal('subject')"><i class="fa-solid fa-plus me-2"></i>Tambah Mapel</button>
+                    </div>
+                    <div class="card-custom p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Kode Mapel</th>
+                                        <th>Nama Mata Pelajaran</th>
+                                        <th class="text-end">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(subj, index) in subjects" :key="subj.id">
+                                        <td>{{ index + 1 }}</td>
+                                        <td><span class="badge bg-primary">{{ subj.kode }}</span></td>
+                                        <td><strong>{{ subj.nama }}</strong></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-warning me-2" @click="editSubject(subj)"><i class="fa-solid fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" @click="deleteData('subjects', subj.id)"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="subjects.length === 0">
+                                        <td colspan="4" class="text-center py-4 text-muted">Belum ada data mata pelajaran.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU 3: KELAS -->
+                <div v-if="activeMenu === 'classes'">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold m-0"><i class="fa-solid fa-school text-primary me-2"></i>Manajemen Kelas</h4>
+                        <button class="btn btn-primary" @click="openModal('class')"><i class="fa-solid fa-plus me-2"></i>Tambah Kelas</button>
+                    </div>
+                    <div class="card-custom p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Kelas</th>
+                                        <th>Tingkat</th>
+                                        <th>Tahun Ajaran</th>
+                                        <th class="text-end">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(cls, index) in classes" :key="cls.id">
+                                        <td>{{ index + 1 }}</td>
+                                        <td><strong>{{ cls.nama }}</strong></td>
+                                        <td>Tingkat {{ cls.tingkat }}</td>
+                                        <td><span class="badge bg-info">{{ cls.tahunAjaran }}</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-warning me-2" @click="editClass(cls)"><i class="fa-solid fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" @click="deleteData('classes', cls.id)"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="classes.length === 0">
+                                        <td colspan="5" class="text-center py-4 text-muted">Belum ada data kelas.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU 4: SISWA -->
+                <div v-if="activeMenu === 'students'">
+                    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                        <h4 class="fw-bold m-0"><i class="fa-solid fa-users text-primary me-2"></i>Data Seluruh Siswa</h4>
+                        <div class="d-flex gap-2 align-items-center flex-wrap">
+                            <input type="text" class="form-control" placeholder="Cari nama atau NIS..." v-model="searchStudent" style="max-width: 200px;">
+                            <button class="btn btn-outline-success" @click="downloadStudentTemplate" title="Unduh Template Excel Pengisian Siswa">
+                                <i class="fa-solid fa-file-arrow-down me-1"></i> Template Excel
+                            </button>
+                            <label class="btn btn-outline-info m-0 cursor-pointer" title="Unggah Excel Data Siswa">
+                                <i class="fa-solid fa-file-arrow-up me-1"></i> Impor Excel
+                                <input type="file" @change="importStudentsExcel" accept=".xlsx, .xls" style="display: none;">
+                            </label>
+                            <button class="btn btn-primary text-nowrap" @click="openModal('student')"><i class="fa-solid fa-user-plus me-1"></i> Siswa Baru</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card-custom p-4">
+                        <div class="alert alert-warning py-2 mb-3 small d-flex align-items-center" v-if="classes.length === 0">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                            Silakan tambahkan data Kelas terlebih dahulu sebelum mengimpor atau menambahkan siswa.
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>NIS</th>
+                                        <th>Nama Lengkap</th>
+                                        <th>L/P</th>
+                                        <th>Kelas</th>
+                                        <th>No. HP Wali</th>
+                                        <th>Alamat</th>
+                                        <th class="text-end">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="stu in filteredStudents" :key="stu.id">
+                                        <td><code>{{ stu.nis }}</code></td>
+                                        <td><strong>{{ stu.nama }}</strong></td>
+                                        <td><span class="badge" :class="stu.gender === 'L' ? 'bg-primary' : 'bg-danger'">{{ stu.gender }}</span></td>
+                                        <td>{{ getClassName(stu.kelasId) }}</td>
+                                        <td>{{ stu.hporangtua }}</td>
+                                        <td>{{ stu.alamat }}</td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-warning me-2" @click="editStudent(stu)"><i class="fa-solid fa-edit"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger" @click="deleteData('students', stu.id)"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="filteredStudents.length === 0">
+                                        <td colspan="7" class="text-center py-4 text-muted">Data siswa tidak ditemukan / masih kosong.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU 5: NILAI SISWA -->
+                <div v-if="activeMenu === 'grades'">
+                    <div class="card-custom p-4 mb-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-square-poll-vertical text-primary me-2"></i>Input Nilai Formatif & Sumatif</h5>
+                        <div class="row g-3">
+                            <div class="col-md-5">
+                                <label class="form-label">Mata Pelajaran</label>
+                                <select class="form-select" v-model="selectedMapel">
+                                    <option value="">Pilih Mapel</option>
+                                    <option v-for="sub in subjects" :value="sub.id">{{ sub.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Kelas</label>
+                                <select class="form-select" v-model="selectedClass">
+                                    <option value="">Pilih Kelas</option>
+                                    <option v-for="cls in classes" :value="cls.id">{{ cls.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button class="btn btn-primary w-100" @click="loadGradeSheet"><i class="fa-solid fa-eye me-2"></i>Buka</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="gradeSheetActive" class="card-custom p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <h5 class="fw-bold m-0 text-primary">Input Nilai: {{ getSubjectName(selectedMapel) }} - {{ getClassName(selectedClass) }}</h5>
+                            <button class="btn btn-primary btn-sm" @click="saveGrades"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Nilai</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle text-center" style="min-width: 1000px;">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th rowspan="2" class="align-middle text-start" style="width: 250px;">Nama Siswa</th>
+                                        <th colspan="4">Formatif (F)</th>
+                                        <th colspan="3">Sumatif Tugas (T)</th>
+                                        <th rowspan="2" style="width: 80px;">PTS</th>
+                                        <th rowspan="2" style="width: 80px;">PAS</th>
+                                    </tr>
+                                    <tr>
+                                        <th style="width: 70px;">F1</th>
+                                        <th style="width: 70px;">F2</th>
+                                        <th style="width: 70px;">F3</th>
+                                        <th style="width: 70px;">F4</th>
+                                        <th style="width: 70px;">T1</th>
+                                        <th style="width: 70px;">T2</th>
+                                        <th style="width: 70px;">T3</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="st in activeClassStudents" :key="st.id">
+                                        <td class="text-start"><strong>{{ st.nama }}</strong></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].f1" min="0" max="100"></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].f2" min="0" max="100"></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].f3" min="0" max="100"></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].f4" min="0" max="100"></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].t1" min="0" max="100"></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].t2" min="0" max="100"></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].t3" min="0" max="100"></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].pts" min="0" max="100"></td>
+                                        <td><input type="number" class="form-control text-center p-1" v-model.number="tempGrades[st.id].pas" min="0" max="100"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU 6: ABSENSI SISWA -->
+                <div v-if="activeMenu === 'attendance'">
+                    <div class="card-custom p-4 mb-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-clipboard-user text-primary me-2"></i>Presensi Harian</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Mata Pelajaran</label>
+                                <select class="form-select" v-model="selectedMapel">
+                                    <option value="">Pilih Mapel</option>
+                                    <option v-for="sub in subjects" :value="sub.id">{{ sub.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Kelas</label>
+                                <select class="form-select" v-model="selectedClass">
+                                    <option value="">Pilih Kelas</option>
+                                    <option v-for="cls in classes" :value="cls.id">{{ cls.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tanggal Pengajaran</label>
+                                <input type="date" class="form-control" v-model="attendanceDate">
+                            </div>
+                            <div class="col-md-12 text-end">
+                                <button class="btn btn-primary" @click="loadAttendanceSheet"><i class="fa-solid fa-check-double me-2"></i>Buka Lembar Presensi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="attendanceSheetActive" class="card-custom p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold m-0 text-primary">Lembar Absensi: {{ attendanceDate }}</h5>
+                            <button class="btn btn-primary px-4 btn-sm" @click="saveAttendance"><i class="fa-solid fa-floppy-disk me-1"></i> Simpan Kehadiran</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle text-center">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-start">Nama Lengkap Siswa</th>
+                                        <th style="width: 15%;">Hadir (H)</th>
+                                        <th style="width: 15%;">Izin (I)</th>
+                                        <th style="width: 15%;">Sakit (S)</th>
+                                        <th style="width: 15%;">Alfa (A)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="st in activeClassStudents" :key="st.id">
+                                        <td class="text-start"><strong>{{ st.nama }}</strong></td>
+                                        <td><input type="radio" :name="'att_' + st.id" value="Hadir" v-model="tempAttendance[st.id]" class="form-check-input"></td>
+                                        <td><input type="radio" :name="'att_' + st.id" value="Izin" v-model="tempAttendance[st.id]" class="form-check-input"></td>
+                                        <td><input type="radio" :name="'att_' + st.id" value="Sakit" v-model="tempAttendance[st.id]" class="form-check-input"></td>
+                                        <td><input type="radio" :name="'att_' + st.id" value="Alfa" v-model="tempAttendance[st.id]" class="form-check-input"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU 7: JURNAL MENGAJAR -->
+                <div v-if="activeMenu === 'journal'">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold m-0"><i class="fa-solid fa-book-open text-primary me-2"></i>Jurnal & Log Pembelajaran</h4>
+                        <button class="btn btn-primary" @click="openModal('journal')"><i class="fa-solid fa-pencil me-2"></i>Isi Jurnal Baru</button>
+                    </div>
+
+                    <div class="card-custom p-4">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Mata Pelajaran / Kelas</th>
+                                        <th>Materi / Jam</th>
+                                        <th>Kehadiran</th>
+                                        <th>Lampiran</th>
+                                        <th class="text-end">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="jr in journals" :key="jr.id">
+                                        <td><code>{{ jr.tanggal }}</code></td>
+                                        <td>
+                                            <strong>{{ getSubjectName(jr.mapelId) }}</strong><br>
+                                            <span class="text-muted small">{{ getClassName(jr.kelasId) }}</span>
+                                        </td>
+                                        <td>
+                                            <strong>{{ jr.materi }}</strong><br>
+                                            <span class="text-muted small">Metode: {{ jr.metode }} | Jam: {{ jr.jamPelajaran }}</span>
+                                        </td>
+                                        <td><span class="badge bg-success">{{ jr.jumlahHadir }} Hadir</span></td>
+                                        <td>
+                                            <a v-if="jr.lampiran" :href="jr.lampiran" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa-solid fa-paperclip"></i> Lihat</a>
+                                            <span v-else class="text-muted">-</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-danger" @click="deleteData('journals', jr.id)"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="journals.length === 0">
+                                        <td colspan="6" class="text-center py-4 text-muted">Jurnal pembelajaran Anda masih kosong.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU 8: LAPORAN REKAP -->
+                <div v-if="activeMenu === 'reports'">
+                    <div class="card-custom p-4 mb-4 no-print">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-file-invoice text-primary me-2"></i>Pusat Rekap Laporan</h5>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Kategori Laporan</label>
+                                <select class="form-select" v-model="reportType">
+                                    <option value="rekap_nilai">Rekap Nilai Siswa</option>
+                                    <option value="persentase_kehadiran">Persentase Kehadiran</option>
+                                    <option value="jurnal_guru">Jurnal Guru</option>
+                                    <option value="daftar_nilai_detail">Daftar Nilai Siswa (Gambar 2)</option>
+                                    <option value="daftar_absen_detail">Daftar Absensi Siswa (Gambar 1)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Mata Pelajaran</label>
+                                <select class="form-select" v-model="reportMapel">
+                                    <option value="all">Semua Mapel</option>
+                                    <option v-for="sub in subjects" :value="sub.id">{{ sub.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Kelas</label>
+                                <select class="form-select" v-model="reportClass">
+                                    <option value="all">Semua Kelas</option>
+                                    <option v-for="cls in classes" :value="cls.id">{{ cls.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end gap-2">
+                                <button class="btn btn-primary w-100" @click="generateReportData"><i class="fa-solid fa-magnifying-glass me-2"></i>Tampilkan</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Aksi Cetak & Ekspor (Tampil Jika Data Ready) -->
+                    <div class="d-flex gap-2 justify-content-end mb-3 no-print" v-if="reportDataReady">
+                        <button class="btn btn-danger" @click="printReport" title="Cetak Universal"><i class="fa-solid fa-print me-2"></i>Cetak</button>
+                        <button class="btn btn-warning text-white" @click="exportPDF" title="Unduh Berkas PDF"><i class="fa-solid fa-file-pdf me-2"></i>Ekspor PDF</button>
+                        <button class="btn btn-success" @click="exportExcel" title="Unduh Spreadsheet Excel"><i class="fa-solid fa-file-excel me-2"></i>Ekspor Excel</button>
+                    </div>
+
+                    <!-- Layout Hasil Laporan Dinamis -->
+                    <div v-if="reportDataReady" class="card-custom p-4 bg-white text-dark shadow" id="printableReport">
+                        
+                        <!-- 1. REKAP NILAI SISWA -->
+                        <div v-if="reportType === 'rekap_nilai'">
+                            <div class="text-center mb-4">
+                                <h4 class="fw-bold m-0 text-uppercase text-dark" style="letter-spacing: 1px;">REKAP NILAI SISWA</h4>
+                                <p class="m-0 text-secondary" style="font-size: 1.05rem;">
+                                    Kelas: <strong>{{ reportClass === 'all' ? 'Semua Kelas' : getClassName(reportClass) }}</strong> | 
+                                    Mata Pelajaran: <strong>{{ reportMapel === 'all' ? 'Semua Mapel' : getSubjectName(reportMapel) }}</strong>
+                                </p>
+                                <p class="m-0 text-muted" style="font-size: 0.9rem; font-style: italic;">Semester Genap TA : 2025/2026</p>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-center align-middle table-report w-100">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">No</th>
+                                            <th class="text-start">Nama Siswa</th>
+                                            <th>Mata Pelajaran</th>
+                                            <th>Nilai Akhir (Rata-rata)</th>
+                                            <th>Predikat</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(row, idx) in reportPayload" :key="idx">
+                                            <td>{{ idx + 1 }}</td>
+                                            <td class="text-start"><strong>{{ getStudentName(row.studentId) }}</strong></td>
+                                            <td>{{ getSubjectName(row.mapelId) }}</td>
+                                            <td><span class="badge bg-secondary fs-6">{{ Math.round(row.rata) }}</span></td>
+                                            <td><span class="badge" :class="getPredicateColor(row.rata)">{{ getPredicate(row.rata) }}</span></td>
+                                        </tr>
+                                        <tr v-if="reportPayload.length === 0">
+                                            <td colspan="5" class="py-4 text-muted text-center">Tidak ada data nilai yang sesuai filter.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 2. PERSENTASE KEHADIRAN -->
+                        <div v-if="reportType === 'persentase_kehadiran'">
+                            <div class="text-center mb-4">
+                                <h4 class="fw-bold m-0 text-uppercase text-dark" style="letter-spacing: 1px;">REKAP PERSENTASE KEHADIRAN SISWA</h4>
+                                <p class="m-0 text-secondary" style="font-size: 1.05rem;">
+                                    Kelas: <strong>{{ reportClass === 'all' ? 'Semua Kelas' : getClassName(reportClass) }}</strong>
+                                </p>
+                                <p class="m-0 text-muted" style="font-size: 0.9rem; font-style: italic;">Semester Genap TA : 2025/2026</p>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-center align-middle table-report w-100">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">No</th>
+                                            <th class="text-start">Nama Lengkap</th>
+                                            <th>Hadir (H)</th>
+                                            <th>Izin/Sakit (I/S)</th>
+                                            <th>Alfa (A)</th>
+                                            <th>Persentase Kehadiran</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(row, idx) in reportPayload" :key="idx">
+                                            <td>{{ idx + 1 }}</td>
+                                            <td class="text-start"><strong>{{ row.nama }}</strong></td>
+                                            <td class="cell-present">{{ row.hadir }}</td>
+                                            <td class="cell-permission">{{ row.izin + row.sakit }}</td>
+                                            <td class="cell-absent">{{ row.alfa }}</td>
+                                            <td><span class="badge bg-success fs-6">{{ row.hadir > 0 ? row.persentase : 0 }}%</span></td>
+                                        </tr>
+                                        <tr v-if="reportPayload.length === 0">
+                                            <td colspan="6" class="py-4 text-muted text-center">Tidak ada data siswa yang sesuai filter.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 3. JURNAL GURU -->
+                        <div v-if="reportType === 'jurnal_guru'">
+                            <div class="text-center mb-4">
+                                <h4 class="fw-bold m-0 text-uppercase text-dark" style="letter-spacing: 1px;">JURNAL MENGAJAR GURU</h4>
+                                <p class="m-0 text-secondary" style="font-size: 1.05rem;">
+                                    Pendidik: <strong>{{ profile.nama }}</strong> | NIP: <strong>{{ profile.nip }}</strong>
+                                </p>
+                                <p class="m-0 text-muted" style="font-size: 0.9rem; font-style: italic;">Semester Genap TA : 2025/2026</p>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle table-report w-100">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">No</th>
+                                            <th style="width: 110px;">Tanggal</th>
+                                            <th>Kelas & Mapel</th>
+                                            <th>Materi Pembelajaran</th>
+                                            <th>Metode / Media</th>
+                                            <th style="width: 100px;">Hadir</th>
+                                            <th>Catatan Guru</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(j, idx) in reportPayload" :key="idx">
+                                            <td class="text-center">{{ idx + 1 }}</td>
+                                            <td class="text-center"><code>{{ j.tanggal }}</code></td>
+                                            <td>
+                                                <strong>{{ getClassName(j.kelasId) }}</strong><br>
+                                                <span class="text-muted small">{{ getSubjectName(j.mapelId) }}</span>
+                                            </td>
+                                            <td><strong>{{ j.materi }}</strong><br><span class="text-muted small">Jam: {{ j.jamPelajaran }}</span></td>
+                                            <td>{{ j.metode }}</td>
+                                            <td class="text-center font-weight-bold text-success">{{ j.jumlahHadir }}</td>
+                                            <td>{{ j.catatan || '-' }}</td>
+                                        </tr>
+                                        <tr v-if="reportPayload.length === 0">
+                                            <td colspan="7" class="py-4 text-muted text-center">Tidak ada data jurnal mengajar yang sesuai filter.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 4. DAFTAR NILAI SISWA (GAMBAR 2) -->
+                        <div v-if="reportType === 'daftar_nilai_detail'">
+                            <div class="text-center mb-4">
+                                <h4 class="fw-bold m-0 text-uppercase text-dark" style="letter-spacing: 1px;">DAFTAR NILAI SISWA (DETAIL FORMATIF & SUMATIF)</h4>
+                                <p class="m-0 text-secondary" style="font-size: 1.05rem;">
+                                    Kelas: <strong>{{ getClassName(reportClass) }}</strong> | 
+                                    Mata Pelajaran: <strong>{{ getSubjectName(reportMapel) }}</strong>
+                                </p>
+                                <p class="m-0 text-muted" style="font-size: 0.9rem; font-style: italic;">Semester Genap TA : 2025/2026</p>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-center align-middle table-report w-100">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" style="width: 40px;">No</th>
+                                            <th rowspan="2" class="text-start" style="min-width: 200px;">Nama Siswa</th>
+                                            <th colspan="4">Formatif (F)</th>
+                                            <th colspan="3">Sumatif Tugas (T)</th>
+                                            <th rowspan="2">PTS</th>
+                                            <th rowspan="2">PAS</th>
+                                            <th rowspan="2">Total</th>
+                                            <th rowspan="2">Rata</th>
+                                            <th rowspan="2">Rank</th>
+                                        </tr>
+                                        <tr>
+                                            <th>F1</th>
+                                            <th>F2</th>
+                                            <th>F3</th>
+                                            <th>F4</th>
+                                            <th>T1</th>
+                                            <th>T2</th>
+                                            <th>T3</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(row, idx) in reportPayload" :key="row.studentId">
+                                            <td>{{ idx + 1 }}</td>
+                                            <td class="text-start"><strong>{{ getStudentName(row.studentId) }}</strong></td>
+                                            <td :class="getScoreClass(row.f1)">{{ row.f1 || '-' }}</td>
+                                            <td :class="getScoreClass(row.f2)">{{ row.f2 || '-' }}</td>
+                                            <td :class="getScoreClass(row.f3)">{{ row.f3 || '-' }}</td>
+                                            <td :class="getScoreClass(row.f4)">{{ row.f4 || '-' }}</td>
+                                            <td :class="getScoreClass(row.t1)">{{ row.t1 || '-' }}</td>
+                                            <td :class="getScoreClass(row.t2)">{{ row.t2 || '-' }}</td>
+                                            <td :class="getScoreClass(row.t3)">{{ row.t3 || '-' }}</td>
+                                            <td :class="getScoreClass(row.pts)">{{ row.pts || '-' }}</td>
+                                            <td :class="getScoreClass(row.pas)">{{ row.pas || '-' }}</td>
+                                            <td><strong>{{ row.total }}</strong></td>
+                                            <td style="color: #34495E; font-weight: 600;">{{ Number(row.rata).toFixed(2) }}</td>
+                                            <td><span class="badge bg-secondary">{{ row.rank }}</span></td>
+                                        </tr>
+                                        <tr v-if="reportPayload.length === 0">
+                                            <td colspan="15" class="py-4 text-muted text-center">Silakan pilih Mata Pelajaran dan Kelas yang spesifik (bukan Semua) untuk menampilkan tabel detail.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- 5. DAFTAR ABSENSI SISWA (GAMBAR 1) -->
+                        <div v-if="reportType === 'daftar_absen_detail'">
+                            <div class="text-center mb-4">
+                                <h4 class="fw-bold m-0 text-uppercase text-dark" style="letter-spacing: 1px;">DAFTAR ABSENSI SISWA (PRESENSI HARIAN)</h4>
+                                <p class="m-0 text-secondary" style="font-size: 1.05rem;">
+                                    Kelas: <strong>{{ getClassName(reportClass) }}</strong> | 
+                                    Mata Pelajaran: <strong>{{ getSubjectName(reportMapel) }}</strong>
+                                </p>
+                                <p class="m-0 text-muted" style="font-size: 0.9rem; font-style: italic;">Semester Genap TA : 2025/2026</p>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-center align-middle table-report w-100">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" style="width: 40px;">No</th>
+                                            <th rowspan="2" class="text-start" style="min-width: 200px;">Nama Siswa</th>
+                                            <th colspan="12">Pertemuan Ke (P)</th>
+                                            <th colspan="3">Rekap</th>
+                                            <th colspan="2">Persen</th>
+                                        </tr>
+                                        <tr>
+                                            <th v-for="p in 12" :key="p" style="font-size: 0.75rem; padding: 4px;">
+                                                P{{ p }}<br>
+                                                <span class="text-muted" style="font-weight: normal; font-size: 0.7rem;">
+                                                    {{ getAttendanceHeaderDate(p) }}
+                                                </span>
+                                            </th>
+                                            <th>H</th>
+                                            <th>I/S</th>
+                                            <th>A</th>
+                                            <th>%H</th>
+                                            <th>%A</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(row, idx) in reportPayload" :key="row.studentId">
+                                            <td>{{ idx + 1 }}</td>
+                                            <td class="text-start"><strong>{{ getStudentName(row.studentId) }}</strong></td>
+                                            
+                                            <!-- Menampilkan P1-P12 -->
+                                            <td v-for="p in 12" :key="p" :class="getAttendanceCellClass(row.history[p-1])">
+                                                {{ getAttendanceLetter(row.history[p-1]) }}
+                                            </td>
+
+                                            <!-- Rekap -->
+                                            <td><strong>{{ row.h }}</strong></td>
+                                            <td><strong>{{ row.i }}</strong></td>
+                                            <td><strong>{{ row.a }}</strong></td>
+
+                                            <!-- Persen -->
+                                            <td class="text-success fw-bold">{{ row.hadir > 0 ? row.persenH : 0 }}%</td>
+                                            <td class="text-danger fw-bold">{{ row.hadir > 0 ? row.persenA : 0 }}%</td>
+                                        </tr>
+                                        <tr v-if="reportPayload.length === 0">
+                                            <td colspan="19" class="py-4 text-muted text-center">Silakan pilih Mata Pelajaran dan Kelas yang spesifik (bukan Semua) untuk menampilkan tabel detail.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ✍️ SEKSI TANDA TANGAN (SIGNATURE SECTION) FINAL & RAPI -->
+                        <div class="mt-5 pt-4 signature-section" style="font-size: 0.95rem; color: #000; page-break-inside: avoid;">
+                            <div class="row text-center">
+                                <!-- Sebelah Kiri Bawah -->
+                                <div class="col-6">
+                                    <p class="mb-1">Mengetahui,</p>
+                                    <p class="mb-1">Kepala Sekolah</p>
+                                    <!-- Jarak Tinggi Spasi 3 Baris Sejajar dengan Kanan -->
+                                    <div style="height: 80px;"></div>
+                                    <p class="fw-bold mb-0 text-decoration-underline" style="font-size: 1rem;">Elisabeth Nena, ST,Gr,M.Kom</p>
+                                </div>
+                                <!-- Sebelah Kanan Bawah -->
+                                <div class="col-6">
+                                    <p class="mb-1">Bajawa, {{ getFormattedDate() }}</p>
+                                    <p class="mb-1">Guru Mata Pelajaran</p>
+                                    <!-- Jarak Tinggi Spasi 3 Baris -->
+                                    <div style="height: 80px;"></div>
+                                    <p class="fw-bold mb-0 text-decoration-underline" style="font-size: 1rem;">{{ profile.nama || 'Guru Mata Pelajaran' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ================== MENU 9: PROFIL GURU ================== -->
+                <div v-if="activeMenu === 'profile'">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="card-custom p-4">
+                                <h5 class="fw-bold mb-4"><i class="fa-solid fa-address-card text-primary me-2"></i>Ubah Profil Pendidik</h5>
+                                <form @submit.prevent="updateProfile">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nama Lengkap</label>
+                                        <input type="text" class="form-control" v-model="profile.nama" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">NIP / NUPTK</label>
+                                        <input type="text" class="form-control" v-model="profile.nip">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Nomor WhatsApp</label>
+                                        <input type="text" class="form-control" v-model="profile.nohp">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">URL Foto Profil</label>
+                                        <input type="text" class="form-control" v-model="profile.foto" placeholder="https://">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100"><i class="fa-solid fa-floppy-disk me-2"></i>Simpan Perubahan</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card-custom p-4">
+                                <h5 class="fw-bold mb-4"><i class="fa-solid fa-shield-halved text-warning me-2"></i>Ubah Kata Sandi</h5>
+                                <form @submit.prevent="changePassword">
+                                    <div class="mb-3">
+                                        <label class="form-label">Kata Sandi Saat Ini</label>
+                                        <input type="password" class="form-control" v-model="passwordForm.old" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Kata Sandi Baru</label>
+                                        <input type="password" class="form-control" v-model="passwordForm.new" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Konfirmasi Kata Sandi Baru</label>
+                                        <input type="password" class="form-control" v-model="passwordForm.confirm" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning w-100"><i class="fa-solid fa-key me-2"></i>Ganti Kata Sandi</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- FOOTER SNEAT -->
+            <footer class="footer mt-5 text-center text-muted py-4 no-print border-top">
+                <p class="m-0">&copy; 2026 <strong>GuruKu System</strong>. All rights reserved. Powered by Web Builder Pro-Sarjanasoft.</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP DINAMIS UNTUK TAMBAH / EDIT DATA -->
+    <div class="modal fade" id="dataModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(5px);">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-custom p-3">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-primary">{{ modalTitle }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body border-0 pt-3">
+                    
+                    <!-- FORM: SUBJECT -->
+                    <form v-if="modalType === 'subject'" @submit.prevent="submitSubject">
+                        <div class="mb-3">
+                            <label class="form-label">Kode Mata Pelajaran</label>
+                            <input type="text" class="form-control" v-model="subjectForm.kode" placeholder="K-01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nama Mata Pelajaran</label>
+                            <input type="text" class="form-control" v-model="subjectForm.nama" placeholder="Matematika" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Simpan Mata Pelajaran</button>
+                    </form>
+
+                    <!-- FORM: CLASS -->
+                    <form v-if="modalType === 'class'" @submit.prevent="submitClass">
+                        <div class="mb-3">
+                            <label class="form-label">Nama Kelas</label>
+                            <input type="text" class="form-control" v-model="classForm.nama" placeholder="XII IPA 1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tingkat Kelas</label>
+                            <input type="number" class="form-control" v-model="classForm.tingkat" placeholder="12" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tahun Ajaran</label>
+                            <input type="text" class="form-control" v-model="classForm.tahunAjaran" placeholder="2025/2026" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Simpan Kelas</button>
+                    </form>
+
+                    <!-- FORM: STUDENT -->
+                    <form v-if="modalType === 'student'" @submit.prevent="submitStudent">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">NIS (Nomor Induk)</label>
+                                <input type="text" class="form-control" v-model="studentForm.nis" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Nama Lengkap</label>
+                                <input type="text" class="form-control" v-model="studentForm.nama" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Jenis Kelamin</label>
+                            <select class="form-select" v-model="studentForm.gender" required>
+                                <option value="L">Laki-Laki (L)</option>
+                                <option value="P">Perempuan (P)</option>
+                            </select>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tempat Lahir</label>
+                                <input type="text" class="form-control" v-model="studentForm.tempatLahir">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tanggal Lahir</label>
+                                <input type="date" class="form-control" v-model="studentForm.tanggalLahir">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Kelas Penempatan</label>
+                            <select class="form-select" v-model="studentForm.kelasId" required>
+                                <option value="">Pilih Kelas</option>
+                                <option v-for="cls in classes" :value="cls.id">{{ cls.nama }}</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nomor HP Wali</label>
+                            <input type="text" class="form-control" v-model="studentForm.hporangtua">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Alamat Lengkap</label>
+                            <textarea class="form-control" v-model="studentForm.alamat" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Simpan Data Siswa</button>
+                    </form>
+
+                    <!-- FORM: JOURNAL -->
+                    <form v-if="modalType === 'journal'" @submit.prevent="submitJournal">
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal Pembelajaran</label>
+                            <input type="date" class="form-control" v-model="journalForm.tanggal" required>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Mata Pelajaran</label>
+                                <select class="form-select" v-model="journalForm.mapelId" required>
+                                    <option value="">Pilih Mapel</option>
+                                    <option v-for="sub in subjects" :value="sub.id">{{ sub.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Kelas</label>
+                                <select class="form-select" v-model="journalForm.kelasId" required>
+                                    <option value="">Pilih Kelas</option>
+                                    <option v-for="cls in classes" :value="cls.id">{{ cls.nama }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Jam Pelajaran</label>
+                                <input type="text" class="form-control" v-model="journalForm.jamPelajaran" placeholder="07:30 - 09:00" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Jumlah Hadir</label>
+                                <input type="number" class="form-control" v-model.number="journalForm.jumlahHadir" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Materi Pokok Pembelajaran</label>
+                            <input type="text" class="form-control" v-model="journalForm.materi" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Metode / Media</label>
+                            <input type="text" class="form-control" v-model="journalForm.metode" placeholder="Ceramah & Diskusi Kelompok" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">URL Link Dokumentasi (Opsional)</label>
+                            <input type="url" class="form-control" v-model="journalForm.lampiran" placeholder="https://drive.google.com/...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Catatan Tambahan Guru</label>
+                            <textarea class="form-control" v-model="journalForm.catatan" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Simpan Jurnal</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5 Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Vue.js 3 Script -->
+<script>
+    const { createApp, ref, computed, onMounted, nextTick } = Vue;
+
+    createApp({
+        setup() {
+            // URL DEPLOY GOOGLE APPS SCRIPT ANDA
+            const GAS_URL = "https://script.google.com/macros/s/AKfycbwxlD1dmGhlI9kginPKXvwaqWaC9BMLCkiCzfD-2JtPkqte99gQ3OHV9A3OowP_Ay83bg/exec"; 
+            
+            // TOKEN HARUS SAMA DENGAN SECRET_TOKEN DI APPS SCRIPT
+            const SECRET_TOKEN = "GURUKU";
+
+            // ==================== REACTIVE STATES ====================
+            const loading = ref(false);
+            const theme = ref('light');
+            const isLoggedIn = ref(false);
+            const authView = ref('login');
+            const sidebarActive = ref(false);
+            const activeMenu = ref('dashboard');
+            const searchStudent = ref('');
+            const showProfileDropdown = ref(false);
+
+            const authForm = ref({ email: '', password: '', remember: false });
+            const passwordForm = ref({ old: '', new: '', confirm: '' });
+
+            const profile = ref({ nama: 'Guru Utama', nip: '-', nohp: '-', foto: '', password: 'sarjanasoft' });
+            const subjects = ref([]);
+            const classes = ref([]);
+            const students = ref([]);
+            const grades = ref([]);
+            const attendance = ref([]);
+            const journals = ref([]);
+
+            const modalType = ref('');
+            const modalTitle = ref('');
+            let bootstrapModal = null;
+
+            const subjectForm = ref({ id: '', kode: '', nama: '' });
+            const classForm = ref({ id: '', nama: '', tingkat: '', tahunAjaran: '' });
+            const studentForm = ref({ id: '', nis: '', nama: '', gender: 'L', tempatLahir: '', tanggalLahir: '', kelasId: '', hporangtua: '', alamat: '' });
+            const journalForm = ref({ id: '', tanggal: '', mapelId: '', kelasId: '', jamPelajaran: '', materi: '', metode: '', jumlahHadir: 0, catatan: '', lampiran: '' });
+
+            const selectedMapel = ref('');
+            const selectedClass = ref('');
+            const attendanceDate = ref(new Date().toISOString().substring(0,10));
+            const gradeSheetActive = ref(false);
+            const attendanceSheetActive = ref(false);
+            const tempGrades = ref({});
+            const tempAttendance = ref({});
+
+            const reportType = ref('rekap_nilai');
+            const reportMapel = ref('all');
+            const reportClass = ref('all');
+            const reportDataReady = ref(false);
+            const reportPayload = ref([]);
+            const uniqueReportDates = ref([]);
+
+            const collectionsMap = {
+                subjects: subjects,
+                classes: classes,
+                students: students,
+                journals: journals,
+                grades: grades,
+                attendance: attendance
+            };
+
+            const filteredStudents = computed(() => {
+                return students.value.filter(s => {
+                    const term = searchStudent.value.toLowerCase();
+                    return s.nama.toLowerCase().includes(term) || s.nis.includes(term);
+                });
+            });
+
+            const activeClassStudents = computed(() => {
+                return students.value.filter(s => s.kelasId === selectedClass.value);
+            });
+
+            onMounted(() => {
+                try {
+                    const storedTheme = localStorage.getItem('guruku_theme') || 'light';
+                    theme.value = storedTheme;
+                    document.documentElement.setAttribute('data-theme', storedTheme);
+
+                    const storedUser = localStorage.getItem('guruku_session');
+                    if (storedUser) {
+                        const parsed = JSON.parse(storedUser);
+                        if (parsed && typeof parsed === 'object') {
+                            profile.value = parsed;
+                            isLoggedIn.value = true;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Iframe memblokir LocalStorage. Auto-login dinonaktifkan.");
+                }
+                
+                // SELALU MUAT DATA DARI CLOUD SAAT STARTUP (Penyelamatan refresh / login ulang)
+                fetchDataFromDatabase();
+            });
+
+            const toggleTheme = () => {
+                const newTheme = theme.value === 'light' ? 'dark' : 'light';
+                theme.value = newTheme;
+                document.documentElement.setAttribute('data-theme', newTheme);
+                try { localStorage.setItem('guruku_theme', newTheme); } catch(e) {}
+            };
+
+            const switchMenu = (menu) => {
+                activeMenu.value = menu;
+                sidebarActive.value = false;
+                gradeSheetActive.value = false;
+                attendanceSheetActive.value = false;
+                reportDataReady.value = false;
+                showProfileDropdown.value = false;
+
+                if (menu === 'dashboard') {
+                    nextTick(() => { initCharts(); });
+                }
+            };
+
+            // API Fetcher dengan simple request & query action untuk keandalan penuh di Apps Script
+            const apiRequest = async (action, payload = {}) => {
+                loading.value = true;
+                payload.token = SECRET_TOKEN;
+                try {
+                    const response = await fetch(`${GAS_URL}?action=${action}`, {
+                        method: 'POST',
+                        mode: 'no-cors', // Mencegah blokir preflight CORS pada Google Sites
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    return { success: true };
+                } catch (err) {
+                    console.error("API Error: ", err);
+                    Swal.fire('Error', 'Gagal menyimpan ke Cloud: ' + err.message, 'error');
+                    return { success: false };
+                } finally {
+                    loading.value = false;
+                }
+            };
+
+            // Menarik Data dari Database dengan PELACAK ERROR PINTAR
+            const fetchDataFromDatabase = async () => {
+                loading.value = true;
+                try {
+                    const response = await fetch(`${GAS_URL}?action=fetch`);
+                    const textData = await response.text();
+                    
+                    if (textData.includes("<html") || textData.includes("<body")) {
+                        throw new Error("PENGATURAN_APPS_SCRIPT_SALAH");
+                    }
+
+                    const data = JSON.parse(textData);
+
+                    if (data && typeof data === 'object') {
+                        // Muat profil & password yang tersimpan di cloud jika ada
+                        if (data.profile) {
+                            profile.value = data.profile;
+                        }
+
+                        subjects.value = data.subjects ? Object.values(data.subjects) : [];
+                        classes.value = data.classes ? Object.values(data.classes) : [];
+                        students.value = data.students ? Object.values(data.students) : [];
+                        grades.value = data.grades ? Object.values(data.grades) : [];
+                        attendance.value = data.attendance ? Object.values(data.attendance) : [];
+                        journals.value = data.journals ? Object.values(data.journals) : [];
+
+                        if (!Array.isArray(subjects.value)) subjects.value = Object.values(subjects.value);
+                        if (!Array.isArray(classes.value)) classes.value = Object.values(classes.value);
+                        if (!Array.isArray(students.value)) students.value = Object.values(students.value);
+                        if (!Array.isArray(grades.value)) grades.value = Object.values(grades.value);
+                        if (!Array.isArray(attendance.value)) attendance.value = Object.values(attendance.value);
+                        if (!Array.isArray(journals.value)) journals.value = Object.values(journals.value);
+
+                        nextTick(() => { initCharts(); });
+                    }
+                } catch (err) {
+                    console.error("Gagal server:", err);
+                    let errorTitle = 'Koneksi Cloud Gagal';
+                    let errorHtml = 'Gagal mengambil data dari server. Pastikan koneksi internet Anda stabil.';
+
+                    if (err.message === "PENGATURAN_APPS_SCRIPT_SALAH" || (err.message && err.message.includes("Failed to fetch"))) {
+                        errorTitle = 'Akses Script Diblokir Google!';
+                        errorHtml = `<div style="text-align: left; font-size: 0.9em;">
+                        <b>Penyebab Utama:</b> Web App Google Apps Script Anda saat ini belum dipublish dengan benar untuk diakses publik.<br><br>
+                        <b>SOLUSI (Wajib Diikuti Ulang):</b><br>
+                        1. Buka Apps Script, klik tombol biru <b>Deploy</b> (Terapkan) -> Pilih <b>Manage deployments</b> (Kelola penerapan).<br>
+                        2. Klik ikon Pensil ✏️ di sebelah kanan.<br>
+                        3. <b>[SANGAT PENTING]</b> Pada kotak Version (Versi), Anda <b>WAJIB memilih "New version" (Versi Baru)</b>.<br>
+                        4. Who has access (Siapa yang memiliki akses): <b>Anyone</b> (Siapa Saja).<br>
+                        5. Klik Deploy. Ganti GAS_URL di kode Anda jika URL-nya berubah.
+                        </div>`;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: errorTitle,
+                        html: errorHtml,
+                        confirmButtonColor: '#8E44AD'
+                    });
+                } finally {
+                    loading.value = false;
+                }
+            };
+
+            const downloadStudentTemplate = () => {
+                const data = [
+                    { "NIS": "1001", "Nama Lengkap": "ALFRIANUS PELO RUGHA", "Jenis Kelamin (L/P)": "L", "Tempat Lahir": "Nagekeo", "Tanggal Lahir (YYYY-MM-DD)": "2010-05-12", "Alamat": "Jl. Trans Flores", "Nomor HP Orang Tua": "08123456789" },
+                    { "NIS": "1002", "Nama Lengkap": "ANDREANUS LEO TEKA", "Jenis Kelamin (L/P)": "L", "Tempat Lahir": "Ende", "Tanggal Lahir (YYYY-MM-DD)": "2010-08-20", "Alamat": "Wolowaru", "Nomor HP Orang Tua": "08129876543" }
+                ];
+                const worksheet = XLSX.utils.json_to_sheet(data);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Siswa Baru");
+                XLSX.writeFile(workbook, "Template_Data_Siswa_GuruKu.xlsx");
+            };
+
+            const importStudentsExcel = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                if (classes.value.length === 0) {
+                    Swal.fire('Gagal', 'Silakan buat minimal satu Kelas terlebih dahulu!', 'error');
+                    event.target.value = '';
+                    return;
+                }
+
+                const classOptions = {};
+                classes.value.forEach(cls => {
+                    classOptions[cls.id] = `${cls.nama} (Tingkat ${cls.tingkat})`;
+                });
+
+                Swal.fire({
+                    title: 'Pilih Kelas Tujuan',
+                    text: 'Seluruh siswa di file Excel akan ditempatkan di kelas ini dan diunggah ke Cloud.',
+                    input: 'select',
+                    inputOptions: classOptions,
+                    inputPlaceholder: 'Pilih Kelas',
+                    showCancelButton: true,
+                    confirmButtonColor: '#8E44AD',
+                    cancelButtonColor: '#7F8C8D',
+                    confirmButtonText: 'Mulai Impor ke Cloud',
+                    cancelButtonText: 'Batal',
+                    inputValidator: (value) => {
+                        if (!value) return 'Anda harus memilih kelas tujuan terlebih dahulu!';
+                    }
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const targetClassId = result.value;
+                        const reader = new FileReader();
+                        
+                        reader.onload = async (e) => {
+                            try {
+                                const data = new Uint8Array(e.target.result);
+                                const workbook = XLSX.read(data, { type: 'array' });
+                                const sheetName = workbook.SheetNames[0];
+                                const sheet = workbook.Sheets[sheetName];
+                                const json = XLSX.utils.sheet_to_json(sheet);
+
+                                let importedCount = 0;
+                                let duplicatedCount = 0;
+
+                                json.forEach(row => {
+                                    if (row["Nama Lengkap"] && row["NIS"]) {
+                                        const nisStr = String(row["NIS"]).trim();
+                                        
+                                        const isDuplicate = students.value.some(s => s.nis === nisStr);
+                                        if (isDuplicate) {
+                                            duplicatedCount++;
+                                            return;
+                                        }
+
+                                        const newStudent = {
+                                            id: 'STU' + Date.now() + Math.random().toString(36).substr(2, 5),
+                                            nis: nisStr,
+                                            nama: String(row["Nama Lengkap"]).toUpperCase().trim(),
+                                            gender: String(row["Jenis Kelamin (L/P)"] || 'L').toUpperCase().trim() === 'P' ? 'P' : 'L',
+                                            tempatLahir: row["Tempat Lahir"] || '',
+                                            tanggalLahir: row["Tanggal Lahir (YYYY-MM-DD)"] || '',
+                                            kelasId: targetClassId,
+                                            hporangtua: row["Nomor HP Orang Tua"] || '',
+                                            alamat: row["Alamat"] || ''
+                                        };
+                                        students.value.push(newStudent);
+                                        importedCount++;
+                                    }
+                                });
+
+                                if (importedCount > 0) {
+                                    await apiRequest('save', { endpoint: 'students', data: students.value });
+                                    let successMsg = `Berhasil mengimpor ${importedCount} siswa baru ke database Cloud.`;
+                                    if (duplicatedCount > 0) successMsg += ` (${duplicatedCount} dilewati karena NIS ganda)`;
+                                    Swal.fire({ icon: 'success', title: 'Sukses Impor!', text: successMsg, confirmButtonColor: '#8E44AD' });
+                                } else {
+                                    Swal.fire({ icon: 'warning', title: 'Tidak Ada Siswa', text: 'Tidak ada baris siswa yang valid.', confirmButtonColor: '#8E44AD' });
+                                }
+                            } catch (error) {
+                                Swal.fire('Error', 'Gagal memproses berkas Excel.', 'error');
+                            }
+                        };
+                        reader.readAsArrayBuffer(file);
+                    }
+                    event.target.value = '';
+                });
+            };
+
+            const handleLogin = () => {
+                loading.value = true;
+                setTimeout(() => {
+                    loading.value = false;
+                    if (authForm.value.email.trim() !== '' && authForm.value.password === profile.value.password) {
+                        isLoggedIn.value = true;
+                        try {
+                            if (authForm.value.remember) localStorage.setItem('guruku_session', JSON.stringify(profile.value));
+                        } catch(e) {}
+                        Swal.fire({ icon: 'success', title: 'Selamat Datang!', text: 'Berhasil masuk ke GuruKu.', timer: 1500, showConfirmButton: false });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Login Gagal', text: 'Sandi salah (Gunakan sandi default: sarjanasoft).' });
+                    }
+                }, 800);
+            };
+
+            const handleLogout = () => {
+                isLoggedIn.value = false;
+                try { localStorage.removeItem('guruku_session'); } catch(e) {}
+                Swal.fire({ icon: 'info', title: 'Keluar', text: 'Sesi mengajar Anda telah diakhiri.', timer: 1200, showConfirmButton: false });
+            };
+
+            const handleResetPassword = () => {
+                loading.value = true;
+                setTimeout(() => {
+                    loading.value = false;
+                    Swal.fire({ icon: 'success', title: 'Tautan Terkirim', text: 'Instruksi reset dikirim ke email Anda!', confirmButtonColor: '#8E44AD' });
+                    authView.value = 'login';
+                }, 1000);
+            };
+
+            const openModal = (type, editData = null) => {
+                modalType.value = type;
+                bootstrapModal = new bootstrap.Modal(document.getElementById('dataModal'));
+                if (type === 'subject') {
+                    modalTitle.value = editData ? "Edit Mata Pelajaran" : "Mata Pelajaran Baru";
+                    subjectForm.value = editData ? { ...editData } : { id: '', kode: '', nama: '' };
+                } else if (type === 'class') {
+                    modalTitle.value = editData ? "Edit Data Kelas" : "Kelas Baru";
+                    classForm.value = editData ? { ...editData } : { id: '', nama: '', tingkat: '', tahunAjaran: '' };
+                } else if (type === 'student') {
+                    modalTitle.value = editData ? "Edit Data Siswa" : "Penerimaan Siswa Baru";
+                    studentForm.value = editData ? { ...editData } : { id: '', nis: '', nama: '', gender: 'L', tempatLahir: '', tanggalLahir: '', kelasId: selectedClass.value || '', hporangtua: '', alamat: '' };
+                } else if (type === 'journal') {
+                    modalTitle.value = "Tulis Jurnal Mengajar";
+                    journalForm.value = { id: '', tanggal: new Date().toISOString().substring(0,10), mapelId: '', kelasId: '', jamPelajaran: '', materi: '', metode: '', jumlahHadir: 0, catatan: '', lampiran: '' };
+                }
+                bootstrapModal.show();
+            };
+
+            const submitSubject = async () => {
+                if (!subjectForm.value.id) {
+                    subjectForm.value.id = 'SUB' + Date.now();
+                    subjects.value.push({ ...subjectForm.value });
+                } else {
+                    const idx = subjects.value.findIndex(s => s.id === subjectForm.value.id);
+                    if (idx !== -1) subjects.value[idx] = { ...subjectForm.value };
+                }
+                const success = await apiRequest('save', { endpoint: 'subjects', data: subjects.value });
+                if (success) {
+                    bootstrapModal.hide();
+                    Swal.fire('Sukses', 'Data disimpan ke Cloud!', 'success');
+                }
+            };
+
+            const editSubject = (sub) => openModal('subject', sub);
+
+            const submitClass = async () => {
+                if (!classForm.value.id) {
+                    classForm.value.id = 'CLS' + Date.now();
+                    classes.value.push({ ...classForm.value });
+                } else {
+                    const idx = classes.value.findIndex(c => c.id === classForm.value.id);
+                    if (idx !== -1) classes.value[idx] = { ...classForm.value };
+                }
+                const success = await apiRequest('save', { endpoint: 'classes', data: classes.value });
+                if (success) {
+                    bootstrapModal.hide();
+                    Swal.fire('Sukses', 'Data disimpan ke Cloud!', 'success');
+                }
+            };
+
+            const editClass = (cls) => openModal('class', cls);
+
+            const submitStudent = async () => {
+                if (!studentForm.value.id) {
+                    studentForm.value.id = 'STU' + Date.now();
+                    students.value.push({ ...studentForm.value });
+                } else {
+                    const idx = students.value.findIndex(s => s.id === studentForm.value.id);
+                    if (idx !== -1) students.value[idx] = { ...studentForm.value };
+                }
+                const success = await apiRequest('save', { endpoint: 'students', data: students.value });
+                if (success) {
+                    bootstrapModal.hide();
+                    Swal.fire('Sukses', 'Data disimpan ke Cloud!', 'success');
+                }
+            };
+
+            const editStudent = (stu) => openModal('student', stu);
+
+            const submitJournal = async () => {
+                journalForm.value.id = 'JRN' + Date.now();
+                journals.value.push({ ...journalForm.value });
+                const success = await apiRequest('save', { endpoint: 'journals', data: journals.value });
+                if (success) {
+                    bootstrapModal.hide();
+                    Swal.fire('Sukses', 'Data disimpan ke Cloud!', 'success');
+                }
+            };
+
+            const deleteData = (koleksi, id) => {
+                Swal.fire({
+                    title: 'Hapus Data?',
+                    text: "Tindakan ini menghapus data secara permanen dari server Cloud.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#8E44AD',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Ya, Hapus!'
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        const targetCollection = collectionsMap[koleksi];
+                        if (targetCollection) {
+                            const originalData = [...targetCollection.value];
+                            targetCollection.value = targetCollection.value.filter(item => item.id !== id);
+                            const success = await apiRequest('save', { endpoint: koleksi, data: targetCollection.value });
+                            if (success) {
+                                Swal.fire('Terhapus!', 'Data berhasil dihapus secara online.', 'success');
+                            } else {
+                                targetCollection.value = originalData; // Rollback
+                            }
+                        }
+                    }
+                });
+            };
+
+            const loadGradeSheet = () => {
+                if (!selectedMapel.value || !selectedClass.value) {
+                    Swal.fire('Info', 'Pilih mapel dan kelas terlebih dahulu.', 'info');
+                    return;
+                }
+                gradeSheetActive.value = true;
+                activeClassStudents.value.forEach(st => {
+                    const existing = grades.value.find(g => g.studentId === st.id && g.mapelId === selectedMapel.value && g.kelasId === selectedClass.value);
+                    tempGrades.value[st.id] = existing ? { ...existing } : { f1: '', f2: '', f3: '', f4: '', t1: '', t2: '', t3: '', pts: '', pas: '' };
+                });
+            };
+
+            const calculateTotalScore = (studentId) => {
+                const g = tempGrades.value[studentId];
+                if (!g) return 0;
+                let total = 0;
+                ['f1', 'f2', 'f3', 'f4', 't1', 't2', 't3', 'pts', 'pas'].forEach(k => {
+                    if (g[k] !== '' && g[k] != null) total += Number(g[k]);
+                });
+                return total;
+            };
+
+            const calculateAverageScore = (studentId) => {
+                const g = tempGrades.value[studentId];
+                if (!g) return 0;
+                let total = 0; let count = 0;
+                ['f1', 'f2', 'f3', 'f4', 't1', 't2', 't3', 'pts', 'pas'].forEach(k => {
+                    if (g[k] !== '' && g[k] != null) { total += Number(g[k]); count++; }
+                });
+                return count > 0 ? (total / count).toFixed(2) : '0.00';
+            };
+
+            const getStudentRank = (studentId) => {
+                const averages = activeClassStudents.value.map(st => ({ id: st.id, avg: Number(calculateAverageScore(st.id)) }));
+                averages.sort((a, b) => b.avg - a.avg);
+                const idx = averages.findIndex(item => item.id === studentId);
+                return idx !== -1 ? idx + 1 : '-';
+            };
+
+            const saveGrades = async () => {
+                activeClassStudents.value.forEach(st => {
+                    const total = Number(calculateTotalScore(st.id));
+                    const average = Number(calculateAverageScore(st.id));
+                    const rank = getStudentRank(st.id);
+                    const existingIdx = grades.value.findIndex(g => g.studentId === st.id && g.mapelId === selectedMapel.value && g.kelasId === selectedClass.value);
+                    const payload = {
+                        id: grades.value[existingIdx]?.id || 'GRD' + Date.now() + Math.random().toString(36).substr(2, 5),
+                        studentId: st.id, mapelId: selectedMapel.value, kelasId: selectedClass.value,
+                        f1: tempGrades.value[st.id].f1, f2: tempGrades.value[st.id].f2, f3: tempGrades.value[st.id].f3, f4: tempGrades.value[st.id].f4,
+                        t1: tempGrades.value[st.id].t1, t2: tempGrades.value[st.id].t2, t3: tempGrades.value[st.id].t3,
+                        pts: tempGrades.value[st.id].pts, pas: tempGrades.value[st.id].pas, total, rata: average, rank
+                    };
+                    if (existingIdx !== -1) grades.value[existingIdx] = payload;
+                    else grades.value.push(payload);
+                });
+                const success = await apiRequest('save', { endpoint: 'grades', data: grades.value });
+                if (success) {
+                    Swal.fire('Sukses', 'Nilai akademik disimpan ke Cloud!', 'success');
+                }
+            };
+
+            const loadAttendanceSheet = () => {
+                if (!selectedMapel.value || !selectedClass.value || !attendanceDate.value) {
+                    Swal.fire('Info', 'Mohon lengkapi parameter filter presensi.', 'info');
+                    return;
+                }
+                attendanceSheetActive.value = true;
+                activeClassStudents.value.forEach(st => {
+                    const existing = attendance.value.find(a => a.studentId === st.id && a.mapelId === selectedMapel.value && a.kelasId === selectedClass.value && a.tanggal === attendanceDate.value);
+                    tempAttendance.value[st.id] = existing ? existing.status : 'Hadir';
+                });
+            };
+
+            const saveAttendance = async () => {
+                activeClassStudents.value.forEach(st => {
+                    const existingIdx = attendance.value.findIndex(a => a.studentId === st.id && a.mapelId === selectedMapel.value && a.kelasId === selectedClass.value && a.tanggal === attendanceDate.value);
+                    const payload = {
+                        id: attendance.value[existingIdx]?.id || 'ATT' + Date.now() + Math.random().toString(36).substr(2, 5),
+                        studentId: st.id, mapelId: selectedMapel.value, kelasId: selectedClass.value,
+                        tanggal: attendanceDate.value, status: tempAttendance.value[st.id]
+                    };
+                    if (existingIdx !== -1) attendance.value[existingIdx] = payload;
+                    else attendance.value.push(payload);
+                });
+                const success = await apiRequest('save', { endpoint: 'attendance', data: attendance.value });
+                if (success) {
+                    Swal.fire('Sukses', 'Daftar absensi direkam ke Database Online!', 'success');
+                }
+            };
+
+            const generateReportData = () => {
+                reportDataReady.value = true;
+                let targetStudents = students.value;
+                if (reportClass.value !== 'all') {
+                    targetStudents = targetStudents.filter(s => s.kelasId === reportClass.value);
+                }
+
+                if (reportType.value === 'rekap_nilai') {
+                    let dataset = [];
+                    targetStudents.forEach(st => {
+                        let filteredGrades = grades.value.filter(g => g.studentId === st.id);
+                        if (reportMapel.value !== 'all') filteredGrades = filteredGrades.filter(g => g.mapelId === reportMapel.value);
+                        filteredGrades.forEach(g => {
+                            const scoresArr = [g.f1, g.f2, g.f3, g.f4, g.t1, g.t2, g.t3, g.pts, g.pas].map(Number).filter(x => !isNaN(x) && x > 0);
+                            const total = scoresArr.reduce((a, b) => a + b, 0);
+                            const count = scoresArr.length || 1;
+                            dataset.push({ studentId: st.id, mapelId: g.mapelId, rata: (total / count) });
+                        });
+                    });
+                    reportPayload.value = dataset;
+                }
+                else if (reportType.value === 'persentase_kehadiran') {
+                    reportPayload.value = targetStudents.map(st => {
+                        let classAtts = attendance.value.filter(a => a.studentId === st.id);
+                        if (reportMapel.value !== 'all') classAtts = classAtts.filter(a => a.mapelId === reportMapel.value);
+                        const total = classAtts.length;
+                        const hadir = classAtts.filter(a => a.status === 'Hadir').length;
+                        const izin = classAtts.filter(a => a.status === 'Izin').length;
+                        const sakit = classAtts.filter(a => a.status === 'Sakit').length;
+                        const alfa = classAtts.filter(a => a.status === 'Alfa').length;
+                        return { nama: st.nama, hadir, izin, sakit, alfa, persentase: total > 0 ? Math.round((hadir / total) * 100) : 100 };
+                    });
+                }
+                else if (reportType.value === 'jurnal_guru') {
+                    let filteredJournals = journals.value;
+                    if (reportMapel.value !== 'all') filteredJournals = filteredJournals.filter(j => j.mapelId === reportMapel.value);
+                    if (reportClass.value !== 'all') filteredJournals = filteredJournals.filter(j => j.kelasId === reportClass.value);
+                    reportPayload.value = filteredJournals;
+                }
+                else if (reportType.value === 'daftar_nilai_detail') {
+                    if (reportMapel.value === 'all' || reportClass.value === 'all') { reportPayload.value = []; return; }
+                    let unsortedPayload = targetStudents.map(st => {
+                        const g = grades.value.find(g => g.studentId === st.id && g.mapelId === reportMapel.value && g.kelasId === reportClass.value) || {};
+                        const scoresArr = [g.f1, g.f2, g.f3, g.f4, g.t1, g.t2, g.t3, g.pts, g.pas].map(Number).filter(x => !isNaN(x) && x > 0);
+                        const total = scoresArr.reduce((a, b) => a + b, 0);
+                        const count = scoresArr.length || 1;
+                        return { studentId: st.id, f1: g.f1, f2: g.f2, f3: g.f3, f4: g.f4, t1: g.t1, t2: g.t2, t3: g.t3, pts: g.pts, pas: g.pas, total, rata: (total / count), rank: 1 };
+                    });
+                    const sorted = [...unsortedPayload].sort((a, b) => b.rata - a.rata);
+                    unsortedPayload.forEach(item => item.rank = sorted.findIndex(x => x.studentId === item.studentId) + 1);
+                    reportPayload.value = unsortedPayload;
+                }
+                else if (reportType.value === 'daftar_absen_detail') {
+                    if (reportMapel.value === 'all' || reportClass.value === 'all') { reportPayload.value = []; return; }
+                    const classAtts = attendance.value.filter(a => a.mapelId === reportMapel.value && a.kelasId === reportClass.value);
+                    const dates = [...new Set(classAtts.map(a => a.tanggal))].sort();
+                    uniqueReportDates.value = dates.slice(0, 12);
+                    reportPayload.value = targetStudents.map(st => {
+                        let hCount = 0; let iCount = 0; let aCount = 0;
+                        const history = uniqueReportDates.value.map(date => {
+                            const att = classAtts.find(a => a.studentId === st.id && a.tanggal === date);
+                            const status = att ? att.status : '';
+                            if (status === 'Hadir') hCount++;
+                            else if (status === 'Izin' || status === 'Sakit') iCount++;
+                            else if (status === 'Alfa') aCount++;
+                            return status;
+                        });
+                        const totalP = uniqueReportDates.value.length || 1;
+                        return { studentId: st.id, history, h: hCount, i: iCount, a: aCount, persenH: Math.round((hCount / totalP) * 100), persenA: Math.round((aCount / totalP) * 100) };
+                    });
+                }
+            };
+
+            const getPredicate = (score) => {
+                const s = Number(score) || 0;
+                if (s >= 85) return 'A'; if (s >= 75) return 'B'; if (s >= 60) return 'C'; if (s >= 45) return 'D'; return 'E';
+            };
+
+            const getPredicateColor = (score) => {
+                const s = Number(score) || 0;
+                if (s >= 85) return 'bg-success'; if (s >= 75) return 'bg-info'; if (s >= 60) return 'bg-warning'; return 'bg-danger';
+            };
+
+            const getAttendanceHeaderDate = (pIndex) => {
+                const dateStr = uniqueReportDates.value[pIndex - 1];
+                if (!dateStr) return '';
+                const parts = dateStr.split('-'); 
+                return `${parseInt(parts[2])}/${parseInt(parts[1])}`; 
+            };
+
+            const getAttendanceLetter = (status) => {
+                if (status === 'Hadir') return 'H'; if (status === 'Izin' || status === 'Sakit') return 'I'; if (status === 'Alfa') return 'A'; return '';
+            };
+
+            const getAttendanceCellClass = (status) => {
+                if (status === 'Hadir') return 'cell-present'; if (status === 'Alfa') return 'cell-absent'; if (status === 'Izin' || status === 'Sakit') return 'cell-permission'; return '';
+            };
+
+            const getScoreClass = (score) => {
+                if (score === undefined || score === null || score === '') return '';
+                const num = Number(score);
+                if (num < 70) return 'score-low'; if (num >= 85) return 'score-high'; return '';
+            };
+
+            // 🖨️ FUNGSI CETAK BEBAS BLOKIR SANDBOX GOOGLE SITES & HANYA MENCETAK LAPORAN
+            const printReport = () => {
+                const printContent = document.getElementById('printableReport');
+                if (!printContent) return;
+                
+                try {
+                    // Membuat iframe tersembunyi untuk mencetak (bypass Sandbox Iframe restrictions)
+                    let iframe = document.getElementById('print-iframe');
+                    if (!iframe) {
+                        iframe = document.createElement('iframe');
+                        iframe.id = 'print-iframe';
+                        iframe.style.position = 'fixed';
+                        iframe.style.right = '0';
+                        iframe.style.bottom = '0';
+                        iframe.style.width = '0';
+                        iframe.style.height = '0';
+                        iframe.style.border = '0';
+                        document.body.appendChild(iframe);
+                    }
+                    
+                    // Menyalin seluruh file style agar tampilan cetak sama persis dengan aslinya
+                    let styles = '';
+                    document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+                        styles += `<link rel="stylesheet" href="${link.href}">`;
+                    });
+                    document.querySelectorAll('style').forEach(style => {
+                        styles += `<style>${style.innerHTML}</style>`;
+                    });
+                    
+                    const doc = iframe.contentWindow.document;
+                    doc.open();
+                    doc.write(`
+                        <html>
+                        <head>
+                            <title>Cetak Rekap Laporan - GuruKu</title>
+                            ${styles}
+                            <style>
+                                body { background: white !important; color: #000 !important; padding: 25px !important; font-size: 11pt !important; }
+                                .card-custom { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+                                .no-print { display: none !important; }
+                                table { width: 100% !important; border-collapse: collapse !important; margin-bottom: 20px; }
+                                .table-report th { background-color: #ECEFF1 !important; color: #000 !important; border: 1.5px solid #2C3E50 !important; padding: 8px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                                .table-report td { border: 1.5px solid #BDC3C7 !important; padding: 8px !important; }
+                                .signature-section { margin-top: 50px !important; page-break-inside: avoid; }
+                                /* Memastikan table responsif mengalir penuh di halaman cetak */
+                                .table-responsive { display: block !important; width: 100% !important; overflow-x: visible !important; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container-fluid">
+                                ${printContent.innerHTML}
+                            </div>
+                        </body>
+                        </html>
+                    `);
+                    doc.close();
+                    
+                    // Jeda pendek agar aset gaya termuat penuh sebelum dialog cetak terbuka
+                    setTimeout(() => {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    }, 500);
+                } catch (err) {
+                    console.warn("Pencetakan lewat iframe diblokir browser, beralih ke native window.print()");
+                    // Solusi alternatif jika browser memblokir akses iframe dinamis di Google Sites
+                    window.focus();
+                    window.print();
+                }
+            };
+
+            // 📥 FUNGSI EKSPOR PDF SEJAJAR KERTAS A4 PORTRAIT TANPA POTONG / SPASI KOSONG
+            const exportPDF = () => {
+                const element = document.getElementById('printableReport');
+                if (!element) return;
+                
+                loading.value = true;
+                
+                // Melakukan kloning element untuk menghindari manipulasi pada DOM aktif
+                const clone = element.cloneNode(true);
+                
+                // Mencabut wrapper responsive yang menyebabkan scrollbar/pemotongan layout di PDF
+                const responsiveWrappers = clone.querySelectorAll('.table-responsive');
+                responsiveWrappers.forEach(wrapper => {
+                    const parent = wrapper.parentNode;
+                    while (wrapper.firstChild) {
+                        parent.insertBefore(wrapper.firstChild, wrapper);
+                    }
+                    parent.removeChild(wrapper);
+                });
+                
+                // Memastikan semua table mengalir 100% lebar kertas
+                const tables = clone.querySelectorAll('table');
+                tables.forEach(table => {
+                    table.style.width = '100%';
+                    table.style.tableLayout = 'auto';
+                });
+                
+                // Menerapkan gaya khusus A4 Portrait pada kloningan
+                clone.style.width = '790px'; // Lebar standar proporsi A4 Portrait
+                clone.style.padding = '20px';
+                clone.style.background = '#FFFFFF';
+                clone.style.color = '#000000';
+                
+                // Menyematkan kloningan secara tersembunyi agar diproses oleh html2pdf
+                clone.style.position = 'absolute';
+                clone.style.left = '-9999px';
+                clone.style.top = '0';
+                document.body.appendChild(clone);
+
+                const opt = {
+                    margin:       [10, 10, 10, 10], // Margin aman 10mm (atas, kiri, bawah, kanan)
+                    filename:     `Laporan_${reportType.value}_Kelas_${getClassName(reportClass.value)}.pdf`,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { 
+                        scale: 2, 
+                        useCORS: true, 
+                        logging: false,
+                        width: 790 
+                    },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }, // Memaksa Portrait A4 murni
+                    pagebreak:    { mode: 'css' } // Mencegah lompatan spasi kosong besar
+                };
+
+                html2pdf().from(clone).set(opt).save().then(() => {
+                    document.body.removeChild(clone);
+                    loading.value = false;
+                    Swal.fire('Sukses', 'Berkas PDF laporan berhasil diunduh dengan rapi.', 'success');
+                }).catch(err => {
+                    console.error("Gagal cetak PDF:", err);
+                    if (clone.parentNode) {
+                        document.body.removeChild(clone);
+                    }
+                    loading.value = false;
+                    Swal.fire('Gagal', 'Terjadi kesalahan saat memproses ekspor PDF.', 'error');
+                });
+            };
+
+            // 📊 FUNGSI EKSPOR EXCEL (Dengan Auto-Fit Kolom agar Rapih)
+            const exportExcel = () => {
+                const element = document.getElementById('printableReport');
+                const table = element.querySelector('table');
+                if (!table) {
+                    Swal.fire('Info', 'Tidak ada tabel data untuk diekspor.', 'info');
+                    return;
+                }
+                
+                // Gunakan opsi raw:true agar NIS/No HP tidak dikonversi jadi rumus aneh
+                const wb = XLSX.utils.table_to_book(table, { sheet: "Data Laporan", raw: true });
+                const ws = wb.Sheets["Data Laporan"];
+                
+                // Logika Auto-Fit Lebar Kolom
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                const cols = [];
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    let max_width = 8; // Lebar standar
+                    for (let R = range.s.r; R <= range.e.r; ++R) {
+                        const cell = ws[XLSX.utils.encode_cell({c:C, r:R})];
+                        if (cell && cell.v) {
+                            const len = cell.v.toString().length;
+                            if (len > max_width) max_width = len;
+                        }
+                    }
+                    // Batasi maksimal 50 karakter agar kolom tidak melebar tak terhingga
+                    cols.push({ wch: max_width < 50 ? max_width + 2 : 50 }); 
+                }
+                ws['!cols'] = cols;
+
+                XLSX.writeFile(wb, `Laporan_${reportType.value}_${getClassName(reportClass.value)}.xlsx`);
+                Swal.fire('Sukses', 'Berkas Excel berhasil diekspor dengan rapi.', 'success');
+            };
+
+            // 📅 FORMAT TANGGAL INDONESIA
+            const getFormattedDate = () => {
+                const date = new Date();
+                const months = [
+                    "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+                const day = date.getDate();
+                const month = months[date.getMonth()];
+                const year = date.getFullYear();
+                return `${day} ${month} ${year}`;
+            };
+
+            const updateProfile = async () => {
+                const success = await apiRequest('save', { endpoint: 'profile', data: profile.value });
+                if (success) {
+                    try {
+                        localStorage.setItem('guruku_session', JSON.stringify(profile.value));
+                    } catch(e) {}
+                    Swal.fire('Sukses', 'Informasi profil Anda diperbarui di Cloud.', 'success');
+                }
+            };
+
+            const changePassword = async () => {
+                if (passwordForm.value.old !== profile.value.password) { Swal.fire('Gagal', 'Sandi saat ini salah.', 'error'); return; }
+                if (passwordForm.value.new !== passwordForm.value.confirm) { Swal.fire('Gagal', 'Sandi baru tidak cocok.', 'error'); return; }
+                profile.value.password = passwordForm.value.new;
+                
+                const success = await apiRequest('save', { endpoint: 'profile', data: profile.value });
+                if (success) {
+                    try {
+                        localStorage.setItem('guruku_session', JSON.stringify(profile.value));
+                    } catch(e) {}
+                    Swal.fire('Sukses', 'Sandi login diperbarui di Cloud!', 'success');
+                    passwordForm.value = { old: '', new: '', confirm: '' };
+                }
+            };
+
+            const getClassName = (id) => classes.value.find(c => c.id === id)?.nama || 'N/A';
+            const getSubjectName = (id) => subjects.value.find(s => s.id === id)?.nama || 'N/A';
+            const getStudentName = (id) => students.value.find(s => s.id === id)?.nama || 'N/A';
+
+            let chartInstance1 = null; let chartInstance2 = null;
+            const initCharts = () => {
+                const ctx1 = document.getElementById('attendanceChart'); const ctx2 = document.getElementById('gradesCategoryChart');
+                if (chartInstance1) { try { chartInstance1.destroy(); } catch(e) {} }
+                if (chartInstance2) { try { chartInstance2.destroy(); } catch(e) {} }
+                if (ctx1) {
+                    try {
+                        chartInstance1 = new Chart(ctx1, {
+                            type: 'line', data: { labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'], datasets: [{ label: 'Tingkat Kehadiran (%)', data: [98, 95, 99, 94, 97, 100], borderColor: '#8E44AD', backgroundColor: 'rgba(142, 68, 173, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false }
+                        });
+                    } catch (e) {}
+                }
+                if (ctx2) {
+                    try {
+                        chartInstance2 = new Chart(ctx2, {
+                            type: 'doughnut', data: { labels: ['Sangat Baik (A)', 'Baik (B)', 'Cukup (C)', 'Kurang (D/E)'], datasets: [{ data: [45, 35, 15, 5], backgroundColor: ['#2ECC71', '#3498DB', '#F1C40F', '#E74C3C'] }] }, options: { responsive: true, maintainAspectRatio: false }
+                        });
+                    } catch (e) {}
+                }
+            };
+
+            return {
+                loading, theme, isLoggedIn, authView, sidebarActive, activeMenu, searchStudent, showProfileDropdown,
+                authForm, passwordForm, profile, subjects, classes, students, grades, attendance, journals,
+                modalType, modalTitle, subjectForm, classForm, studentForm, journalForm,
+                selectedMapel, selectedClass, attendanceDate, gradeSheetActive, attendanceSheetActive,
+                tempGrades, tempAttendance, reportType, reportMapel, reportClass, reportDataReady, reportPayload,
+                uniqueReportDates, downloadStudentTemplate, importStudentsExcel,
+                toggleTheme, switchMenu, handleLogin, handleLogout, handleResetPassword, getAttendanceHeaderDate, getAttendanceLetter,
+                getAttendanceCellClass, getScoreClass, getPredicate, getPredicateColor,
+                openModal, submitSubject, editSubject, submitClass, editClass, submitStudent, editStudent,
+                submitJournal, deleteData, loadGradeSheet, saveGrades, loadAttendanceSheet, saveAttendance,
+                generateReportData, printReport, exportPDF, exportExcel, getFormattedDate, updateProfile, changePassword,
+                getClassName, getSubjectName, getStudentName, filteredStudents, activeClassStudents
+            }
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>
