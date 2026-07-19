@@ -9,7 +9,7 @@
     <!-- FontAwesome 6 Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2 family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Chart.js -->
@@ -75,13 +75,85 @@
             100% { background-position: 40px 40px, 60px 60px; }
         }
 
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(20, 15, 38, 0.88) 0%, rgba(142, 68, 173, 0.65) 100%), url('https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            padding: 40px 20px;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 1150px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        .auth-info-pane {
+            padding: 50px;
+            color: #ffffff;
+            background: rgba(142, 68, 173, 0.12);
+            border-right: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .auth-form-pane {
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.94);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        [data-theme="dark"] .auth-form-pane {
+            background: rgba(43, 38, 63, 0.96);
+            color: #E1DBEC;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: transform 0.25s, background-color 0.25s;
+        }
+
+        .info-card:hover {
+            transform: translateX(6px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        @media (max-width: 991.98px) {
+            .auth-wrapper {
+                max-width: 550px;
+            }
+            .auth-info-pane {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+                padding: 35px 25px;
+            }
+            .auth-form-pane {
+                padding: 35px 25px;
+            }
+        }
+
+        /* Core Dashboard elements styling */
         .sidebar {
             width: var(--sidebar-width);
             height: 100vh;
             position: fixed;
             top: 0;
             left: 0;
-            background: rgba(43, 38, 63, 0.85);
+            background: rgba(43, 38, 63, 0.9);
             backdrop-filter: blur(10px);
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             transition: transform var(--transition-speed) ease-in-out;
@@ -150,26 +222,6 @@
             box-shadow: 0 8px 25px rgba(142, 68, 173, 0.15);
         }
 
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, rgba(142, 68, 173, 0.1) 0%, rgba(230, 126, 34, 0.1) 100%);
-            padding: 20px;
-        }
-
-        .auth-card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 420px;
-            padding: 35px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
         [data-theme="dark"] .form-control, [data-theme="dark"] .form-select {
             background-color: #241F35;
             border-color: rgba(255, 255, 255, 0.1);
@@ -233,45 +285,118 @@
         </div>
     </div>
 
+    <!-- SNEAT SPLIT LAYOUT AUTHENTICATION SCREEN -->
     <div v-if="!isLoggedIn" class="auth-container">
-        <div class="auth-card">
-            <div class="text-center mb-4">
-                <div class="mb-2"><i class="fa-solid fa-graduation-cap fa-3x text-primary"></i></div>
-                <h3 class="fw-bold text-primary">GuruKu</h3>
-                <p class="text-muted small">Manajemen Kelas & Penilaian Modern</p>
-            </div>
+        <div class="auth-wrapper">
+            <div class="row g-0">
+                
+                <!-- LEFT COLUMN: PUBLIC INFORMATION / APPLICATION ABOUT -->
+                <div class="col-lg-7 auth-info-pane d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center mb-4">
+                            <i class="fa-solid fa-graduation-cap fa-3x text-warning me-3"></i>
+                            <div>
+                                <h2 class="fw-bold m-0 text-white">Sistem GuruKu</h2>
+                                <span class="badge bg-warning text-dark fw-bold">Platform Akademik Guru Mandiri</span>
+                            </div>
+                        </div>
+                        
+                        <h4 class="fw-semibold text-white mb-3 text-uppercase" style="letter-spacing: 0.5px;">Tentang Aplikasi GuruKu</h4>
+                        <p class="text-white-50 mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+                            GuruKu adalah portal asisten pengajaran modern berbasis komputasi awan yang dirancang untuk membantu tenaga pendidik mengelola administrasi kelas secara efektif, praktis, dan akurat secara real-time.
+                        </p>
+                        
+                        <!-- Interaktif Info Cards -->
+                        <div class="info-card d-flex align-items-start">
+                            <i class="fa-solid fa-shield-halved text-warning fs-4 mt-1 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold text-white mb-1">Penyimpanan Terpusat & Aman</h6>
+                                <p class="text-white-50 m-0 small">Sistem terhubung langsung ke Firebase Realtime Database Anda melalui integrasi backend Google Apps Script yang tangguh dan terlindungi.</p>
+                            </div>
+                        </div>
 
-            <form v-if="authView === 'login'" @submit.prevent="handleLogin">
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" v-model="authForm.email" required placeholder="guru@guruku.id">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Kata Sandi</label>
-                    <input type="password" class="form-control" v-model="authForm.password" required placeholder="••••••••">
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMe" v-model="authForm.remember">
-                        <label class="form-check-label small" for="rememberMe">Ingat Saya</label>
+                        <div class="info-card d-flex align-items-start">
+                            <i class="fa-solid fa-square-poll-vertical text-warning fs-4 mt-1 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold text-white mb-1">Penilaian Sumatif & Formatif Otomatis</h6>
+                                <p class="text-white-50 m-0 small">Sistem menghitung nilai rata-rata, perankingan otomatis, serta konversi kriteria kompetensi kelulusan siswa secara akurat.</p>
+                            </div>
+                        </div>
+
+                        <div class="info-card d-flex align-items-start">
+                            <i class="fa-solid fa-chart-line text-warning fs-4 mt-1 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold text-white mb-1">Analisis Kehadiran Cerdas</h6>
+                                <p class="text-white-50 m-0 small">Menyediakan panel monitoring kehadiran kelas (periode Mingguan, 1 Bulan, 1 Semester) dan mendeteksi siswa berisiko alpa.</p>
+                            </div>
+                        </div>
                     </div>
-                    <span class="small text-primary cursor-pointer text-decoration-underline" @click="authView = 'reset'">Lupa Sandi?</span>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 py-2" style="background-color: var(--primary-color);">Masuk <i class="fa-solid fa-sign-in ms-2"></i></button>
-            </form>
 
-            <form v-if="authView === 'reset'" @submit.prevent="handleResetPassword">
-                <p class="text-muted small text-center mb-4">Masukkan email Anda untuk melakukan reset kata sandi default.</p>
-                <div class="mb-3">
-                    <label class="form-label">Email Terdaftar</label>
-                    <input type="email" class="form-control" v-model="authForm.email" required placeholder="guru@guruku.id">
+                    <div class="pt-3 border-top border-white-10 d-none d-lg-block">
+                        <small class="text-white-50">
+                            <i class="fa-solid fa-copyright me-1"></i> 2026 GuruKu System. Dibuat khusus untuk pengampu mata pelajaran. Oleh Ally R.
+                            <a href="https://wa.me/6282236008339" target="_blank" class="text-success ms-2 text-decoration-none fw-semibold" title="Hubungi via WhatsApp">
+                                <i class="fa-brands fa-whatsapp fs-6 align-middle"></i> <span>No WA: 082236008339</span>
+                            </a>
+                        </small>
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 py-2 mb-2" style="background-color: var(--primary-color);">Kirim Link Reset</button>
-                <button type="button" class="btn btn-light w-100 py-2" @click="authView = 'login'">Kembali</button>
-            </form>
+
+                <!-- RIGHT COLUMN: LOGIN FORM -->
+                <div class="col-lg-5 auth-form-pane">
+                    <div class="text-center mb-4">
+                        <h3 class="fw-bold text-primary">Login app GuruKu</h3>
+                        <p class="text-muted small">Akses Login Admin dan Guru Mapel</p>
+                    </div>
+
+                    <form v-if="authView === 'login'" @submit.prevent="handleLogin">
+                        <div class="mb-3">
+                            <label class="form-label font-semibold">Alamat Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-envelope text-muted"></i></span>
+                                <input type="email" class="form-control border-start-0" v-model="authForm.email" required placeholder="guru@guruku.id">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label font-semibold">Kata Sandi</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
+                                <input :type="showPassword ? 'text' : 'password'" class="form-control border-start-0 border-end-0" v-model="authForm.password" required placeholder="••••••••">
+                                <span class="input-group-text bg-transparent border-start-0 cursor-pointer" @click="showPassword = !showPassword" title="Tampilkan/Sembunyikan Sandi">
+                                    <i :class="showPassword ? 'fa-solid fa-eye-slash text-muted' : 'fa-solid fa-eye text-muted'"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe" v-model="authForm.remember">
+                                <label class="form-check-label small" for="rememberMe">Ingat Saya</label>
+                            <!--</div>
+                            <span class="small text-primary cursor-pointer text-decoration-underline" @click="authView = 'reset'">Lupa Sandi?</span>
+                        </div>-->
+                        <button type="submit" class="btn btn-primary w-100 py-2.5 fw-semibold" style="background-color: var(--primary-color);">Masuk Sekarang <i class="fa-solid fa-arrow-right-to-bracket ms-2"></i></button>
+                    </form>
+
+                    <form v-if="authView === 'reset'" @submit.prevent="handleResetPassword">
+                        <p class="text-muted small text-center mb-4">Masukkan email terdaftar Anda untuk menerima instruksi pembuatan ulang sandi.</p>
+                        <div class="mb-3">
+                            <label class="form-label">Email Terdaftar</label>
+                            <input type="email" class="form-control" v-model="authForm.email" required placeholder="guru@guruku.id">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 py-2 mb-2" style="background-color: var(--primary-color);">Kirim Link Atur Ulang</button>
+                        <button type="button" class="btn btn-light w-100 py-2" @click="authView = 'login'">Kembali ke Login</button>
+                    </form>
+
+                    <div class="alert alert-info py-2 px-3 mb-0 mt-4 small text-center">
+                        <i class="fa-solid fa-circle-info me-1"></i> Aplikasi Guru Mata Pelajaran: <strong>Versi 1.2</strong>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 
+    <!-- MAIN DASHBOARD PANEL -->
     <div v-else class="wrapper">
         <aside class="sidebar" :class="{ 'active': sidebarActive }">
             <div class="d-flex align-items-center justify-content-between p-4 border-bottom border-secondary">
@@ -1070,7 +1195,7 @@
                             </div>
                         </div>
 
-                        <!-- ✍️ SEKSI TANDA TANGAN -->
+                        <!-- SEKSI TANDA TANGAN -->
                         <div class="mt-5 pt-4 signature-section" style="font-size: 0.95rem; color: #000; page-break-inside: avoid;">
                             <div class="row text-center">
                                 <div class="col-6">
@@ -1091,7 +1216,6 @@
                     </div>
                 </div>
 
-                <!-- ================== MENU 9: PROFIL GURU ================== -->
                 <div v-if="activeMenu === 'profile'">
                     <div class="row g-4">
                         <div class="col-md-6">
@@ -1144,7 +1268,6 @@
 
             </main>
 
-            <!-- FOOTER SNEAT -->
             <footer class="footer mt-5 text-center text-muted py-4 no-print border-top">
                 <p class="m-0">&copy; 2026 <strong>GuruKu System</strong>. All rights reserved. Powered by Web Builder Pro-Sarjanasoft.</p>
             </footer>
@@ -1304,14 +1427,16 @@
 
     createApp({
         setup() {
+            // SINKRONISASI API BACKEND GOOGLE APPS SCRIPT
             const GAS_URL = "https://script.google.com/macros/s/AKfycbx4bXNj3QugjMIiOorxYXxf0frBaJoNS7zUEpGVazLz0FWBLd9nQ9QL_3qAK5DAjGBJBA/exec"; 
             const SECRET_TOKEN = "GURUKU";
 
-            // ==================== REACTIVE STATES ====================
+            // REACTIVE STATES
             const loading = ref(false);
             const theme = ref('light');
             const isLoggedIn = ref(false);
             const authView = ref('login');
+            const showPassword = ref(false);
             const sidebarActive = ref(false);
             const activeMenu = ref('dashboard');
             const searchStudent = ref('');
@@ -1352,7 +1477,7 @@
             const reportPayload = ref([]);
             const uniqueReportDates = ref([]);
 
-            // STATE KEHADIRAN KELAS (BARU)
+            // STATE KEHADIRAN KELAS
             const selectedAttendanceClass = ref('');
             const selectedAttendanceMapel = ref('');
             const selectedAttendancePeriod = ref('week');
@@ -1946,7 +2071,6 @@
                 if (num < 70) return 'score-low'; if (num >= 85) return 'score-high'; return '';
             };
 
-            // 🖨️ FUNGSI CETAK BEBAS BLOKIR SANDBOX GOOGLE SITES & HANYA MENCETAK LAPORAN
             const printReport = () => {
                 const printContent = document.getElementById('printableReport');
                 if (!printContent) return;
@@ -2005,7 +2129,6 @@
                 }, 500);
             };
 
-            // 📥 FUNGSI EKSPOR PDF SEJAJAR KERTAS A4 PORTRAIT TANPA POTONG / SPASI KOSONG
             const exportPDF = () => {
                 const element = document.getElementById('printableReport');
                 if (!element) return;
@@ -2331,7 +2454,7 @@
             };
 
             return {
-                loading, theme, isLoggedIn, authView, sidebarActive, activeMenu, searchStudent, showProfileDropdown,
+                loading, theme, isLoggedIn, authView, showPassword, sidebarActive, activeMenu, searchStudent, showProfileDropdown,
                 authForm, passwordForm, profile, subjects, classes, students, grades, attendance, journals,
                 modalType, modalTitle, subjectForm, classForm, studentForm, journalForm,
                 selectedMapel, selectedClass, attendanceDate, gradeSheetActive, attendanceSheetActive,
