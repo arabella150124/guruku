@@ -378,17 +378,17 @@
                     </form>
 
                     <form v-if="authView === 'reset'" @submit.prevent="handleResetPassword">
-                        <p class="text-muted small text-center mb-4">Masukkan email terdaftar Anda untuk menerima instruksi pembuatan ulang sandi.</p>
+                        <p class="text-muted small text-center mb-4">Masukkan email terdaftar Anda untuk mengirim permintaan pemulihan sandi secara instan ke WhatsApp Admin (Ally R.).</p>
                         <div class="mb-3">
                             <label class="form-label">Email Terdaftar</label>
                             <input type="email" class="form-control" v-model="authForm.email" required placeholder="guru@guruku.id">
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 py-2 mb-2" style="background-color: var(--primary-color);">Kirim Link Atur Ulang</button>
+                        <button type="submit" class="btn btn-primary w-100 py-2 mb-2" style="background-color: var(--primary-color);">Kirim Permintaan Reset</button>
                         <button type="button" class="btn btn-light w-100 py-2" @click="authView = 'login'">Kembali ke Login</button>
                     </form>
 
                     <div class="alert alert-info py-2 px-3 mb-0 mt-4 small text-center">
-                        <i class="fa-solid fa-circle-info me-1"></i> Password bawaan pertama kali: <strong>admin12345</strong>
+                        <i class="fa-solid fa-circle-info me-1"></i> Password bawaan pertama kali: <strong>admin123</strong>
                     </div>
                 </div>
 
@@ -1763,12 +1763,34 @@
             };
 
             const handleResetPassword = () => {
-                loading.value = true;
-                setTimeout(() => {
-                    loading.value = false;
-                    Swal.fire({ icon: 'success', title: 'Tautan Terkirim', text: 'Instruksi reset dikirim ke email Anda!', confirmButtonColor: '#8E44AD' });
-                    authView.value = 'login';
-                }, 1000);
+                const email = authForm.value.email.trim();
+                if (!email) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Email Kosong',
+                        text: 'Silakan ketik alamat email terdaftar Anda terlebih dahulu.',
+                        confirmButtonColor: '#8E44AD'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Reset via WhatsApp',
+                    text: `Permintaan reset sandi untuk email "${email}" akan dialihkan ke WhatsApp Admin (Ally R.) untuk segera dibantu proses reset secara aman. Lanjutkan?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#8E44AD',
+                    cancelButtonColor: '#7F8C8D',
+                    confirmButtonText: 'Hubungi WhatsApp',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const message = encodeURIComponent(`Halo Admin GuruKu, saya lupa kata sandi untuk akun email: ${email}. Mohon bantuannya untuk melakukan reset kata sandi default. Terima kasih.`);
+                        const waUrl = `https://wa.me/6282236008339?text=${message}`;
+                        window.open(waUrl, '_blank');
+                        authView.value = 'login';
+                    }
+                });
             };
 
             const openModal = (type, editData = null) => {
