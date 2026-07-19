@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GuruKu - Portal Akademik Guru Modern</title>
+    <title>GuruKu - Portal Academic Guru Modern</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome 6 Icons -->
@@ -227,14 +227,12 @@
 <div class="bg-pattern"></div>
 
 <div id="app">
-    <!-- LOADING SPINNER -->
     <div v-if="loading" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style="z-index: 9999;">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
             <span class="visually-hidden">Memuat...</span>
         </div>
     </div>
 
-    <!-- HALAMAN AUTENTIKASI -->
     <div v-if="!isLoggedIn" class="auth-container">
         <div class="auth-card">
             <div class="text-center mb-4">
@@ -274,7 +272,6 @@
         </div>
     </div>
 
-    <!-- HALAMAN UTAMA APLIKASI -->
     <div v-else class="wrapper">
         <aside class="sidebar" :class="{ 'active': sidebarActive }">
             <div class="d-flex align-items-center justify-content-between p-4 border-bottom border-secondary">
@@ -313,6 +310,9 @@
                 </div>
 
                 <div class="px-4 py-2 text-uppercase text-secondary fs-7 fw-semibold">Laporan</div>
+                <div class="nav-link-custom" :class="{active: activeMenu === 'class_attendance'}" @click="switchMenu('class_attendance')">
+                    <i class="fa-solid fa-chart-column"></i> Kehadiran Kelas
+                </div>
                 <div class="nav-link-custom" :class="{active: activeMenu === 'reports'}" @click="switchMenu('reports')">
                     <i class="fa-solid fa-file-invoice"></i> Rekap Laporan
                 </div>
@@ -359,7 +359,6 @@
             </nav>
 
             <main class="fade-in">
-                <!-- MENU 1: DASHBOARD -->
                 <div v-if="activeMenu === 'dashboard'">
                     <div class="row g-4 mb-4">
                         <div class="col-6 col-lg-3">
@@ -412,7 +411,6 @@
                     </div>
                 </div>
 
-                <!-- MENU 2: MATA PELAJARAN -->
                 <div v-if="activeMenu === 'subjects'">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="fw-bold m-0"><i class="fa-solid fa-book text-primary me-2"></i>Daftar Mata Pelajaran</h4>
@@ -448,7 +446,6 @@
                     </div>
                 </div>
 
-                <!-- MENU 3: KELAS -->
                 <div v-if="activeMenu === 'classes'">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="fw-bold m-0"><i class="fa-solid fa-school text-primary me-2"></i>Manajemen Kelas</h4>
@@ -486,7 +483,6 @@
                     </div>
                 </div>
 
-                <!-- MENU 4: SISWA -->
                 <div v-if="activeMenu === 'students'">
                     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                         <h4 class="fw-bold m-0"><i class="fa-solid fa-users text-primary me-2"></i>Data Seluruh Siswa</h4>
@@ -543,7 +539,6 @@
                     </div>
                 </div>
 
-                <!-- MENU 5: NILAI SISWA -->
                 <div v-if="activeMenu === 'grades'">
                     <div class="card-custom p-4 mb-4">
                         <h5 class="fw-bold mb-3"><i class="fa-solid fa-square-poll-vertical text-primary me-2"></i>Input Nilai Formatif & Sumatif</h5>
@@ -612,7 +607,6 @@
                     </div>
                 </div>
 
-                <!-- MENU 6: ABSENSI SISWA -->
                 <div v-if="activeMenu === 'attendance'">
                     <div class="card-custom p-4 mb-4">
                         <h5 class="fw-bold mb-3"><i class="fa-solid fa-clipboard-user text-primary me-2"></i>Presensi Harian</h5>
@@ -671,7 +665,6 @@
                     </div>
                 </div>
 
-                <!-- MENU 7: JURNAL MENGAJAR -->
                 <div v-if="activeMenu === 'journal'">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h4 class="fw-bold m-0"><i class="fa-solid fa-book-open text-primary me-2"></i>Jurnal & Log Pembelajaran</h4>
@@ -720,7 +713,79 @@
                     </div>
                 </div>
 
-                <!-- MENU 8: LAPORAN REKAP -->
+                <div v-if="activeMenu === 'class_attendance'">
+                    <div class="card-custom p-4 mb-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-line text-primary me-2"></i>Analisis Kehadiran Siswa Per Kelas</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Kelas</label>
+                                <select class="form-select" v-model="selectedAttendanceClass" @change="updateClassAttendanceAnalysis">
+                                    <option value="">Pilih Kelas</option>
+                                    <option v-for="cls in classes" :value="cls.id">{{ cls.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Mata Pelajaran</label>
+                                <select class="form-select" v-model="selectedAttendanceMapel" @change="updateClassAttendanceAnalysis">
+                                    <option value="">Semua Mata Pelajaran</option>
+                                    <option v-for="sub in subjects" :value="sub.id">{{ sub.nama }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Periode Waktu</label>
+                                <div class="btn-group w-100" role="group">
+                                    <button type="button" class="btn" :class="selectedAttendancePeriod === 'week' ? 'btn-primary' : 'btn-outline-primary'" @click="setAttendancePeriod('week')">1 Minggu</button>
+                                    <button type="button" class="btn" :class="selectedAttendancePeriod === 'month' ? 'btn-primary' : 'btn-outline-primary'" @click="setAttendancePeriod('month')">1 Bulan</button>
+                                    <button type="button" class="btn" :class="selectedAttendancePeriod === 'semester' ? 'btn-primary' : 'btn-outline-primary'" @click="setAttendancePeriod('semester')">1 Semester</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="selectedAttendanceClass" class="row g-4 mb-4">
+                        <!-- Stats Cards -->
+                        <div class="col-md-4">
+                            <div class="card-custom p-3 text-center h-100">
+                                <div class="p-3 bg-success bg-opacity-10 text-success rounded-circle mx-auto mb-2" style="width: 60px; height: 60px;">
+                                    <i class="fa-solid fa-percentage fa-lg"></i>
+                                </div>
+                                <h3 class="fw-bold">{{ attendanceStats.average }}%</h3>
+                                <p class="text-muted small m-0">Rata-rata Kehadiran Kelas</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-custom p-3 text-center h-100">
+                                <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-2" style="width: 60px; height: 60px;">
+                                    <i class="fa-solid fa-user-check fa-lg"></i>
+                                </div>
+                                <h6 class="fw-bold text-truncate px-2" style="max-width: 100%;">{{ attendanceStats.topStudent || '-' }}</h6>
+                                <p class="text-muted small m-0">Siswa Kehadiran Terbaik (Terajin)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card-custom p-3 text-center h-100">
+                                <div class="p-3 bg-danger bg-opacity-10 text-danger rounded-circle mx-auto mb-2" style="width: 60px; height: 60px;">
+                                    <i class="fa-solid fa-user-slash fa-lg"></i>
+                                </div>
+                                <h6 class="fw-bold text-truncate px-2" style="max-width: 100%;">{{ attendanceStats.warningStudent || '-' }}</h6>
+                                <p class="text-muted small m-0">Siswa Perlu Perhatian (Sering Alpa)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="selectedAttendanceClass" class="card-custom p-4">
+                        <h5 class="fw-bold mb-3"><i class="fa-solid fa-chart-column text-primary me-2"></i>Grafik Perkembangan Kehadiran (Tren {{ selectedAttendancePeriod === 'week' ? 'Mingguan' : selectedAttendancePeriod === 'month' ? 'Bulanan' : 'Semesteran' }})</h5>
+                        <div style="position: relative; height: 350px;">
+                            <canvas id="classAttendanceTrendChart"></canvas>
+                        </div>
+                    </div>
+                    <div v-else class="card-custom p-5 text-center text-muted">
+                        <i class="fa-solid fa-chart-simple fa-3x mb-3 text-secondary"></i>
+                        <h5>Silakan Pilih Kelas Terlebih Dahulu</h5>
+                        <p class="m-0">Pilih kelas di atas untuk melihat ringkasan statistik dan grafik perkembangan kehadiran siswa Anda.</p>
+                    </div>
+                </div>
+
                 <div v-if="activeMenu === 'reports'">
                     <div class="card-custom p-4 mb-4 no-print">
                         <h5 class="fw-bold mb-3"><i class="fa-solid fa-file-invoice text-primary me-2"></i>Pusat Rekap Laporan</h5>
@@ -1005,22 +1070,18 @@
                             </div>
                         </div>
 
-                        <!-- ✍️ SEKSI TANDA TANGAN (SIGNATURE SECTION) FINAL & RAPI -->
+                        <!-- ✍️ SEKSI TANDA TANGAN -->
                         <div class="mt-5 pt-4 signature-section" style="font-size: 0.95rem; color: #000; page-break-inside: avoid;">
                             <div class="row text-center">
-                                <!-- Sebelah Kiri Bawah -->
                                 <div class="col-6">
                                     <p class="mb-1">Mengetahui,</p>
                                     <p class="mb-1">Kepala Sekolah</p>
-                                    <!-- Jarak Tinggi Spasi 3 Baris Sejajar dengan Kanan -->
                                     <div style="height: 80px;"></div>
                                     <p class="fw-bold mb-0 text-decoration-underline" style="font-size: 1rem;">Elisabeth Nena, ST,Gr,M.Kom</p>
                                 </div>
-                                <!-- Sebelah Kanan Bawah -->
                                 <div class="col-6">
                                     <p class="mb-1">Bajawa, {{ getFormattedDate() }}</p>
                                     <p class="mb-1">Guru Mata Pelajaran</p>
-                                    <!-- Jarak Tinggi Spasi 3 Baris -->
                                     <div style="height: 80px;"></div>
                                     <p class="fw-bold mb-0 text-decoration-underline" style="font-size: 1rem;">{{ profile.nama || 'Guru Mata Pelajaran' }}</p>
                                 </div>
@@ -1243,10 +1304,7 @@
 
     createApp({
         setup() {
-            // URL DEPLOY GOOGLE APPS SCRIPT ANDA
             const GAS_URL = "https://script.google.com/macros/s/AKfycbx4bXNj3QugjMIiOorxYXxf0frBaJoNS7zUEpGVazLz0FWBLd9nQ9QL_3qAK5DAjGBJBA/exec"; 
-            
-            // TOKEN HARUS SAMA DENGAN SECRET_TOKEN DI APPS SCRIPT
             const SECRET_TOKEN = "GURUKU";
 
             // ==================== REACTIVE STATES ====================
@@ -1294,6 +1352,13 @@
             const reportPayload = ref([]);
             const uniqueReportDates = ref([]);
 
+            // STATE KEHADIRAN KELAS (BARU)
+            const selectedAttendanceClass = ref('');
+            const selectedAttendanceMapel = ref('');
+            const selectedAttendancePeriod = ref('week');
+            const attendanceStats = ref({ average: 0, topStudent: '-', warningStudent: '-' });
+            let classAttendanceChartInstance = null;
+
             const collectionsMap = {
                 subjects: subjects,
                 classes: classes,
@@ -1332,15 +1397,13 @@
                     console.warn("Iframe memblokir LocalStorage. Auto-login dinonaktifkan.");
                 }
                 
-                // SELALU MUAT DATA DARI CLOUD SAAT STARTUP (Penyelamatan refresh / login ulang)
                 fetchDataFromDatabase();
 
-                // PENCEGAT PINTAR CTRL+P KEYBOARD
                 window.addEventListener('keydown', (e) => {
                     if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
                         if (activeMenu.value === 'reports' && reportDataReady.value) {
-                            e.preventDefault(); // Matikan print parent window Google Sites
-                            printReport(); // Jalankan print khusus laporan GuruKu
+                            e.preventDefault(); 
+                            printReport(); 
                         }
                     }
                 });
@@ -1363,17 +1426,18 @@
 
                 if (menu === 'dashboard') {
                     nextTick(() => { initCharts(); });
+                } else if (menu === 'class_attendance') {
+                    nextTick(() => { updateClassAttendanceAnalysis(); });
                 }
             };
 
-            // API Fetcher dengan simple request & query action untuk keandalan penuh di Apps Script
             const apiRequest = async (action, payload = {}) => {
                 loading.value = true;
                 payload.token = SECRET_TOKEN;
                 try {
                     const response = await fetch(`${GAS_URL}?action=${action}`, {
                         method: 'POST',
-                        mode: 'no-cors', // Mencegah blokir preflight CORS pada Google Sites
+                        mode: 'no-cors', 
                         headers: {
                             'Content-Type': 'text/plain'
                         },
@@ -1389,7 +1453,6 @@
                 }
             };
 
-            // Menarik Data dari Database dengan PELACAK ERROR PINTAR
             const fetchDataFromDatabase = async () => {
                 loading.value = true;
                 try {
@@ -1403,7 +1466,6 @@
                     const data = JSON.parse(textData);
 
                     if (data && typeof data === 'object') {
-                        // Muat profil & password yang tersimpan di cloud jika ada
                         if (data.profile) {
                             profile.value = data.profile;
                         }
@@ -1683,7 +1745,7 @@
                             if (success) {
                                 Swal.fire('Terhapus!', 'Data berhasil dihapus secara online.', 'success');
                             } else {
-                                targetCollection.value = originalData; // Rollback
+                                targetCollection.value = originalData; 
                             }
                         }
                     }
@@ -1889,7 +1951,6 @@
                 const printContent = document.getElementById('printableReport');
                 if (!printContent) return;
                 
-                // Membuat iframe tersembunyi untuk mencetak (bypass Sandbox Iframe restrictions)
                 let iframe = document.getElementById('print-iframe');
                 if (!iframe) {
                     iframe = document.createElement('iframe');
@@ -1903,7 +1964,6 @@
                     document.body.appendChild(iframe);
                 }
                 
-                // Menyalin seluruh file style agar tampilan cetak sama persis dengan aslinya
                 let styles = '';
                 document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
                     styles += `<link rel="stylesheet" href="${link.href}">`;
@@ -1927,7 +1987,6 @@
                             .table-report th { background-color: #ECEFF1 !important; color: #000 !important; border: 1.5px solid #2C3E50 !important; padding: 8px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
                             .table-report td { border: 1.5px solid #BDC3C7 !important; padding: 8px !important; }
                             .signature-section { margin-top: 50px !important; page-break-inside: avoid; }
-                            /* Memastikan table responsif mengalir penuh di halaman cetak */
                             .table-responsive { display: block !important; width: 100% !important; overflow-x: visible !important; }
                         </style>
                     </head>
@@ -1940,7 +1999,6 @@
                 `);
                 doc.close();
                 
-                // Jeda pendek agar aset gaya termuat penuh sebelum dialog cetak terbuka
                 setTimeout(() => {
                     iframe.contentWindow.focus();
                     iframe.contentWindow.print();
@@ -1953,11 +2011,8 @@
                 if (!element) return;
                 
                 loading.value = true;
-                
-                // Melakukan kloning element untuk menghindari manipulasi pada DOM aktif
                 const clone = element.cloneNode(true);
                 
-                // Mencabut wrapper responsive yang menyebabkan scrollbar/pemotongan layout di PDF
                 const responsiveWrappers = clone.querySelectorAll('.table-responsive');
                 responsiveWrappers.forEach(wrapper => {
                     const parent = wrapper.parentNode;
@@ -1967,27 +2022,24 @@
                     parent.removeChild(wrapper);
                 });
                 
-                // Memastikan semua table mengalir 100% lebar kertas
                 const tables = clone.querySelectorAll('table');
                 tables.forEach(table => {
                     table.style.width = '100%';
                     table.style.tableLayout = 'auto';
                 });
                 
-                // Menerapkan gaya khusus A4 Portrait pada kloningan
-                clone.style.width = '790px'; // Lebar standar proporsi A4 Portrait
+                clone.style.width = '790px'; 
                 clone.style.padding = '20px';
                 clone.style.background = '#FFFFFF';
                 clone.style.color = '#000000';
                 
-                // Menyematkan kloningan secara tersembunyi agar diproses oleh html2pdf
                 clone.style.position = 'absolute';
                 clone.style.left = '-9999px';
                 clone.style.top = '0';
                 document.body.appendChild(clone);
 
                 const opt = {
-                    margin:       [10, 10, 10, 10], // Margin aman 10mm (atas, kiri, bawah, kanan)
+                    margin:       [10, 10, 10, 10], 
                     filename:     `Laporan_${reportType.value}_Kelas_${getClassName(reportClass.value)}.pdf`,
                     image:        { type: 'jpeg', quality: 0.98 },
                     html2canvas:  { 
@@ -1996,8 +2048,8 @@
                         logging: false,
                         width: 790 
                     },
-                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }, // Memaksa Portrait A4 murni
-                    pagebreak:    { mode: ['css', 'legacy'] } // Mencegah lompatan spasi kosong besar
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }, 
+                    pagebreak:    { mode: ['css', 'legacy'] } 
                 };
 
                 html2pdf().from(clone).set(opt).save().then(() => {
@@ -2014,7 +2066,6 @@
                 });
             };
 
-            // 📊 FUNGSI EKSPOR EXCEL (Dengan Auto-Fit Kolom agar Rapih)
             const exportExcel = () => {
                 const element = document.getElementById('printableReport');
                 const table = element.querySelector('table');
@@ -2023,15 +2074,13 @@
                     return;
                 }
                 
-                // Gunakan opsi raw:true agar NIS/No HP tidak dikonversi jadi rumus aneh
                 const wb = XLSX.utils.table_to_book(table, { sheet: "Data Laporan", raw: true });
                 const ws = wb.Sheets["Data Laporan"];
                 
-                // Logika Auto-Fit Lebar Kolom
                 const range = XLSX.utils.decode_range(ws['!ref']);
                 const cols = [];
                 for (let C = range.s.c; C <= range.e.c; ++C) {
-                    let max_width = 8; // Lebar standar
+                    let max_width = 8; 
                     for (let R = range.s.r; R <= range.e.r; ++R) {
                         const cell = ws[XLSX.utils.encode_cell({c:C, r:R})];
                         if (cell && cell.v) {
@@ -2039,7 +2088,6 @@
                             if (len > max_width) max_width = len;
                         }
                     }
-                    // Batasi maksimal 50 karakter agar kolom tidak melebar tak terhingga
                     cols.push({ wch: max_width < 50 ? max_width + 2 : 50 }); 
                 }
                 ws['!cols'] = cols;
@@ -2048,7 +2096,6 @@
                 Swal.fire('Sukses', 'Berkas Excel berhasil diekspor dengan rapi.', 'success');
             };
 
-            // 📅 FORMAT TANGGAL INDONESIA
             const getFormattedDate = () => {
                 const date = new Date();
                 const months = [
@@ -2084,6 +2131,178 @@
                     Swal.fire('Sukses', 'Sandi login diperbarui di Cloud!', 'success');
                     passwordForm.value = { old: '', new: '', confirm: '' };
                 }
+            };
+
+            const setAttendancePeriod = (period) => {
+                selectedAttendancePeriod.value = period;
+                updateClassAttendanceAnalysis();
+            };
+
+            const updateClassAttendanceAnalysis = () => {
+                if (!selectedAttendanceClass.value) {
+                    attendanceStats.value = { average: 0, topStudent: '-', warningStudent: '-' };
+                    return;
+                }
+
+                const classStudents = students.value.filter(s => s.kelasId === selectedAttendanceClass.value);
+                if (classStudents.length === 0) {
+                    attendanceStats.value = { average: 0, topStudent: 'Tidak ada siswa', warningStudent: 'Tidak ada siswa' };
+                    nextTick(() => { drawTrendChart([], []); });
+                    return;
+                }
+
+                let classAtts = attendance.value.filter(a => a.kelasId === selectedAttendanceClass.value);
+                if (selectedAttendanceMapel.value) {
+                    classAtts = classAtts.filter(a => a.mapelId === selectedAttendanceMapel.value);
+                }
+
+                const totalRecords = classAtts.length;
+                const presentRecords = classAtts.filter(a => a.status === 'Hadir').length;
+                const avgPercent = totalRecords > 0 ? Math.round((presentRecords / totalRecords) * 100) : 100;
+
+                let topStuName = '-';
+                let warnStuName = '-';
+                let maxHadir = -1;
+                let maxAlfa = -1;
+
+                classStudents.forEach(st => {
+                    const sAtts = classAtts.filter(a => a.studentId === st.id);
+                    const hadirCount = sAtts.filter(a => a.status === 'Hadir').length;
+                    const alfaCount = sAtts.filter(a => a.status === 'Alfa').length;
+
+                    if (hadirCount > maxHadir && sAtts.length > 0) {
+                        maxHadir = hadirCount;
+                        topStuName = st.nama;
+                    }
+                    if (alfaCount > maxAlfa && alfaCount > 0) {
+                        maxAlfa = alfaCount;
+                        warnStuName = st.nama;
+                    }
+                });
+
+                attendanceStats.value = {
+                    average: avgPercent,
+                    topStudent: topStuName,
+                    warningStudent: warnStuName
+                };
+
+                let labels = [];
+                let chartData = [];
+                const sortedDates = [...new Set(classAtts.map(a => a.tanggal))].sort();
+
+                if (selectedAttendancePeriod.value === 'week') {
+                    const last7Dates = sortedDates.slice(-7);
+                    last7Dates.forEach(dateStr => {
+                        const parts = dateStr.split('-');
+                        labels.push(`${parts[2]}/${parts[1]}`); 
+                        
+                        const dayAtts = classAtts.filter(a => a.tanggal === dateStr);
+                        const dayHadir = dayAtts.filter(a => a.status === 'Hadir').length;
+                        chartData.push(dayAtts.length > 0 ? Math.round((dayHadir / dayAtts.length) * 100) : 100);
+                    });
+                    if (labels.length === 0) {
+                        labels = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+                        chartData = [100, 100, 100, 100, 100];
+                    }
+                } else if (selectedAttendancePeriod.value === 'month') {
+                    const totalDates = sortedDates.length;
+                    if (totalDates > 0) {
+                        const chunkSize = Math.max(1, Math.ceil(totalDates / 4));
+                        for (let i = 0; i < 4; i++) {
+                            labels.push(`Minggu ${i + 1}`);
+                            const chunkDates = sortedDates.slice(i * chunkSize, (i + 1) * chunkSize);
+                            if (chunkDates.length > 0) {
+                                const chunkAtts = classAtts.filter(a => chunkDates.includes(a.tanggal));
+                                const chunkHadir = chunkAtts.filter(a => a.status === 'Hadir').length;
+                                chartData.push(chunkAtts.length > 0 ? Math.round((chunkHadir / chunkAtts.length) * 100) : 100);
+                            } else {
+                                chartData.push(100);
+                            }
+                        }
+                    } else {
+                        labels = ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'];
+                        chartData = [100, 100, 100, 100];
+                    }
+                } else if (selectedAttendancePeriod.value === 'semester') {
+                    const monthNamesIndo = [
+                        "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+                        "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+                    ];
+                    const monthGroups = {};
+                    classAtts.forEach(a => {
+                        const monthKey = a.tanggal.substring(0, 7); 
+                        if (!monthGroups[monthKey]) monthGroups[monthKey] = [];
+                        monthGroups[monthKey].push(a);
+                    });
+
+                    const sortedMonths = Object.keys(monthGroups).sort();
+                    sortedMonths.forEach(mKey => {
+                        const monthInt = parseInt(mKey.split('-')[1]) - 1;
+                        labels.push(monthNamesIndo[monthInt]);
+                        
+                        const mAtts = monthGroups[mKey];
+                        const mHadir = mAtts.filter(a => a.status === 'Hadir').length;
+                        chartData.push(mAtts.length > 0 ? Math.round((mHadir / mAtts.length) * 100) : 100);
+                    });
+
+                    if (labels.length === 0) {
+                        labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'];
+                        chartData = [100, 100, 100, 100, 100, 100];
+                    }
+                }
+
+                nextTick(() => {
+                    drawTrendChart(labels, chartData);
+                });
+            };
+
+            const drawTrendChart = (labels, data) => {
+                const ctx = document.getElementById('classAttendanceTrendChart');
+                if (!ctx) return;
+
+                if (classAttendanceChartInstance) {
+                    classAttendanceChartInstance.destroy();
+                }
+
+                classAttendanceChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Persentase Kehadiran (%)',
+                            data: data,
+                            borderColor: '#8E44AD',
+                            backgroundColor: 'rgba(142, 68, 173, 0.1)',
+                            fill: true,
+                            tension: 0.3,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#8E44AD',
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) { return value + "%" }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` Kehadiran: ${context.parsed.y}%`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             };
 
             const getClassName = (id) => classes.value.find(c => c.id === id)?.nama || 'N/A';
@@ -2123,7 +2342,8 @@
                 openModal, submitSubject, editSubject, submitClass, editClass, submitStudent, editStudent,
                 submitJournal, deleteData, loadGradeSheet, saveGrades, loadAttendanceSheet, saveAttendance,
                 generateReportData, printReport, exportPDF, exportExcel, getFormattedDate, updateProfile, changePassword,
-                getClassName, getSubjectName, getStudentName, filteredStudents, activeClassStudents
+                getClassName, getSubjectName, getStudentName, filteredStudents, activeClassStudents,
+                selectedAttendanceClass, selectedAttendanceMapel, selectedAttendancePeriod, attendanceStats, setAttendancePeriod, updateClassAttendanceAnalysis
             }
         }
     }).mount('#app');
